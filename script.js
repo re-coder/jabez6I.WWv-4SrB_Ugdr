@@ -2,32 +2,64 @@
 document.addEventListener("DOMContentLoaded", () => {
     initializeMilestoneListeners();
     initializeEditor();
+    loadAudioEffects();
+    setupImportExportButtons();
 });
+
+// Sound effects for each goal
+const audioEffects = {
+    1: new Audio("sounds/goal1-sound.mp3"),
+    2: new Audio("sounds/goal2-sound.mp3"),
+    3: new Audio("sounds/goal3-sound.mp3")
+};
+
+// Function to load audio effects for each goal
+function loadAudioEffects() {
+    for (let key in audioEffects) {
+        audioEffects[key].load();
+    }
+}
 
 // Function to initialize milestone listeners for progress calculation
 function initializeMilestoneListeners() {
     const milestoneCheckboxes = document.querySelectorAll(".milestone");
     milestoneCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", updateProgressBar);
+        checkbox.addEventListener("change", () => {
+            updateProgressBar(checkbox.dataset.goal);
+        });
     });
 }
 
 // Function to calculate and update the progress bar for each goal
-function updateProgressBar() {
-    const goalNumber = this.dataset.goal;
+function updateProgressBar(goalNumber) {
     const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
+    const progressPercentageDisplay = document.getElementById(`progress-percentage-${goalNumber}`);
     const checkboxes = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`);
     let total = 0;
 
-    checkboxes.forEach(checkbox => {
-        if (checkbox.checked) {
+    // Enforce sequential milestone completion
+    let lastCompleted = true;
+    checkboxes.forEach((checkbox, index) => {
+        if (lastCompleted && checkbox.checked) {
             total += parseInt(checkbox.value);
+            lastCompleted = true;
+        } else if (!lastCompleted) {
+            checkbox.checked = false; // Uncheck milestones if previous ones are not completed
+        } else {
+            lastCompleted = false;
         }
     });
 
-    // Update the progress bar width
+    // Update the progress bar width and percentage display
     progressBar.style.width = `${total}%`;
+    progressPercentageDisplay.textContent = `${total}%`;
+
+    // Play corresponding sound effect
+    if (total > 0) {
+        audioEffects[goalNumber].play();
+    }
 }
+
 // Function to initialize the editor section for editing goals
 function initializeEditor() {
     const goalSelect = document.getElementById("goal-select");
@@ -57,18 +89,19 @@ function loadGoalData() {
         const milestoneValue = milestone.value;
 
         const milestoneInput = document.createElement("input");
-        milestoneInput.type = "number";
-        milestoneInput.value = milestoneValue;
+        milestoneInput.type = "text";
+        milestoneInput.value = milestone.parentElement.textContent.trim();
         milestoneInput.classList.add("milestone-input");
         milestoneInput.dataset.index = index;
         milestoneInput.dataset.goal = selectedGoal;
 
         const milestoneLabel = document.createElement("label");
-        milestoneLabel.textContent = `Milestone ${index + 1} Value (%):`;
+        milestoneLabel.textContent = `Milestone ${index + 1} Name:`;
         milestoneLabel.appendChild(milestoneInput);
         milestoneEditor.appendChild(milestoneLabel);
     });
 }
+
 // Function to update goal and milestone data based on editor inputs
 function updateGoalData() {
     const selectedGoal = document.getElementById("goal-select").value;
@@ -77,14 +110,74 @@ function updateGoalData() {
     const goalNameInput = document.getElementById("goal-name").value;
     document.getElementById(`goal-name-${selectedGoal}`).textContent = goalNameInput;
 
-    // Update each milestone's percentage value
+    // Update each milestone's name
     const milestoneInputs = document.querySelectorAll(".milestone-input");
     milestoneInputs.forEach(input => {
         const milestoneIndex = input.dataset.index;
         const milestoneCheckbox = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`)[milestoneIndex];
-        milestoneCheckbox.value = input.value;
+        const milestoneLabel = milestoneCheckbox.parentElement;
+
+        milestoneLabel.childNodes[1].textContent = input.value; // Update label name accurately
     });
 
-    // Reset progress calculation based on new values
-    updateProgressBar.call(document.querySelector(`.milestone[data-goal="${selectedGoal}"]`));
+    // Reset progress calculation to reflect any name change
+    updateProgressBar(selectedGoal);
+}
+
+// Function to set up export and import buttons
+function setupImportExportButtons() {
+    const exportButton = document.getElementById("export-button");
+    const importButton = document.getElementById("import-button");
+
+    exportButton.addEventListener("click", exportData);
+    importButton.addEventListener("change", importData);
+}
+
+// Export goal and milestone data to a .txt file
+function exportData() {
+    const data = { goals: [] };
+
+    for (let i = 1; i <= 3; i++) {
+        const goalName = document.getElementById(`goal-name-${i}`).textContent;
+        const milestones = Array.from(document.querySelectorAll(`.milestone[data-goal="${i}"]`)).map((milestone, index) => ({
+            name: milestone.parentElement.textContent.trim(),
+            value: milestone.value
+        }));
+        data.goals.push({ goalName, milestones });
+    }
+
+    const textContent = JSON.stringify(data, null, 2);
+    const blob = new Blob([textContent], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "saved_data.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// Import goal and milestone data from a .txt file
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            data.goals.forEach((goal, goalIndex) => {
+                const goalNumber = goalIndex + 1;
+                document.getElementById(`goal-name-${goalNumber}`).textContent = goal.goalName;
+                goal.milestones.forEach((milestone, milestoneIndex) => {
+                    const milestoneLabel = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`)[milestoneIndex].parentElement;
+                    milestoneLabel.childNodes[1].textContent = milestone.name;
+                });
+            });
+        } catch (error) {
+            alert("Invalid file format. Please upload a valid JSON .txt file.");
+        }
+    };
+    reader.readAsText(file);
 }

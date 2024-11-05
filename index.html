@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The steward's Responsibilities</title>
+    <title>Goal Progress Tracker</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>The steward's Responsibilities</h1>
+        <h1>Goal Progress Tracker</h1>
 
         <div class="goal" id="goal1">
             <h2 id="goal-name-1">Goal 1 <button class="toggle-btn" data-goal="1">Toggle Descriptions</button></h2>
             <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar-1"></div>
+                <div class="progress-bar" id="progress-bar-1">
+                    <span class="progress-percentage" id="progress-percentage-1">0%</span>
+                </div>
             </div>
             <div class="milestones" id="milestones-1">
                 <label><input type="checkbox" class="milestone" data-goal="1" value="20"> Milestone 1</label>
@@ -27,7 +29,9 @@
         <div class="goal" id="goal2">
             <h2 id="goal-name-2">Goal 2 <button class="toggle-btn" data-goal="2">Toggle Descriptions</button></h2>
             <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar-2"></div>
+                <div class="progress-bar" id="progress-bar-2">
+                    <span class="progress-percentage" id="progress-percentage-2">0%</span>
+                </div>
             </div>
             <div class="milestones" id="milestones-2">
                 <label><input type="checkbox" class="milestone" data-goal="2" value="25"> Milestone 1</label>
@@ -40,7 +44,9 @@
         <div class="goal" id="goal3">
             <h2 id="goal-name-3">Goal 3 <button class="toggle-btn" data-goal="3">Toggle Descriptions</button></h2>
             <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar-3"></div>
+                <div class="progress-bar" id="progress-bar-3">
+                    <span class="progress-percentage" id="progress-percentage-3">0%</span>
+                </div>
             </div>
             <div class="milestones" id="milestones-3">
                 <label><input type="checkbox" class="milestone" data-goal="3" value="33"> Milestone 1</label>
@@ -70,7 +76,17 @@
 
                 <button id="update-goal">Update Goal</button>
             </div>
+
+            <!-- Export and Import Buttons -->
+            <button id="export-button">Export to .txt</button>
+            <input type="file" id="import-button" accept=".txt">
         </div>
+
+        <!-- Sound Files -->
+        <audio id="goal1-sound" src="sounds/goal1-sound.mp3"></audio>
+        <audio id="goal2-sound" src="sounds/goal2-sound.mp3"></audio>
+        <audio id="goal3-sound" src="sounds/goal3-sound.mp3"></audio>
+
     </div>
 
     <script src="script.js"></script>
