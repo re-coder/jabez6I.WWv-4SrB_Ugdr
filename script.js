@@ -218,3 +218,96 @@ function importData(event) {
     };
     reader.readAsText(file);
 }
+
+// Adding event listener for title editing
+document.addEventListener("DOMContentLoaded", function() {
+    const titleInput = document.getElementById("page-title");
+    const titleHeading = document.querySelector("h1");
+    
+    // Update title in real-time
+    titleInput.addEventListener("input", function() {
+        titleHeading.textContent = titleInput.value || "The steward's Responsibilities";
+    });
+});
+
+// Enhanced Export Function with editor text fields
+function exportData() {
+    const titleHeading = document.querySelector("h1").textContent;
+    const goals = [];
+
+    document.querySelectorAll(".goal").forEach(goal => {
+        const goalData = {
+            name: goal.querySelector("h2").textContent.trim(),
+            milestones: []
+        };
+
+        goal.querySelectorAll(".milestone").forEach(milestone => {
+            goalData.milestones.push({
+                name: milestone.parentNode.textContent.trim(), // Milestone label text
+                completed: milestone.checked,                  // Checked state
+                value: milestone.value                         // Milestone percentage count
+            });
+        });
+
+        goals.push(goalData);
+    });
+
+    const data = {
+        title: titleHeading,
+        goals: goals
+    };
+
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "exported_data.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Enhanced Import Function to load text field defaults for editor screen
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = JSON.parse(e.target.result);
+
+        // Set title heading in display and editor field
+        if (data.title) {
+            document.querySelector("h1").textContent = data.title;
+            const titleInput = document.getElementById("page-title");
+            if (titleInput) titleInput.value = data.title; // Set default text
+        }
+
+        // Load goals, including editor defaults for names and milestones
+        if (data.goals) {
+            data.goals.forEach((goalData, index) => {
+                const goalElement = document.querySelector("#goal" + (index + 1));
+                const goalNameInput = document.getElementById("goal-name");
+
+                if (goalElement && goalData.name) {
+                    goalElement.querySelector("h2").textContent = goalData.name;
+                    if (goalNameInput) goalNameInput.value = goalData.name; // Set goal name in editor
+                }
+
+                goalData.milestones.forEach((milestoneData, mIndex) => {
+                    const milestone = goalElement.querySelectorAll(".milestone")[mIndex];
+                    if (milestone) {
+                        milestone.checked = milestoneData.completed; // Checked state
+                        milestone.value = milestoneData.value;
+                        milestone.parentNode.childNodes[1].nodeValue = ` ${milestoneData.name}`; // Update milestone name
+                    }
+                });
+            });
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Re-attach updated export and import functions to buttons
+document.getElementById("export-button").onclick = exportData;
+document.getElementById("import-button").addEventListener("change", importData);

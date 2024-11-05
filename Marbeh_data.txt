@@ -6,7 +6,7 @@
       "milestones": [
         {
           "name": "Hire 1-2 workers",
-          "completed": false,
+          "completed": true,
           "value": "20"
         },
         {
@@ -53,7 +53,8 @@
           "name": "undefined",
           "completed": false,
           "value": "100"
-        }      ]
+        }
+      ]
     },
     {
       "name": "Awareness and Opportunity Sourcing",
@@ -72,7 +73,8 @@
           "name": "Meet even more people & refine materials",
           "completed": false,
           "value": "99"
-        }      ]
+        }
+      ]
     }
   ]
 }
