@@ -1,0 +1,103 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(120deg, #0a0a0a, #1a1a1a);
+    color: #ccc;
+    font-family: 'Orbitron', sans-serif; /* Use a futuristic font like Orbitron */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    padding: 20px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+    border-radius: 10px;
+}
+
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #00ff00;
+    text-shadow: 0px 0px 10px #00ff00; /* Neon glow effect */
+}
+
+.goal {
+    margin-bottom: 40px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 30px;
+    background-color: #333;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px #00ff00; /* Neon glow effect */
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00ff00, #007700);
+    box-shadow: 0px 0px 15px #00ff00; /* Neon glow effect */
+    transition: width 0.4s ease;
+    animation: pulse 2s infinite alternate; /* Pulsing animation */
+}
+
+.milestones {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    font-size: 1rem;
+    color: #888;
+}
+
+.milestones label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.milestones input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #00ff00;
+    box-shadow: 0px 0px 8px #00ff00; /* Neon glow effect for checkboxes */
+}
+
+.toggle-btn {
+    background-color: #00ff00;
+    border: none;
+    color: #1a1a1a;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+    box-shadow: 0px 0px 10px #00ff00;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background-color: #007700;
+    box-shadow: 0px 0px 15px #00ff00;
+}
+
+@keyframes pulse {
+    from {
+        transform: scaleX(1);
+        box-shadow: 0px 0px 10px #00ff00;
+    }
+    to {
+        transform: scaleX(1.02);
+        box-shadow: 0px 0px 20px #00ff00;
+    }
+}
