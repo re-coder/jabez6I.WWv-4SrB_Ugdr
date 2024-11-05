@@ -22,8 +22,6 @@ body {
     text-align: center;
     backdrop-filter: blur(8px);
     border-radius: 10px;
-    overflow-y: auto;
-    max-height: 100vh;
 }
 
 h1 {
@@ -57,6 +55,16 @@ h1 {
     animation: pulse 2s infinite alternate;
 }
 
+.progress-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    color: #1a1a1a;
+    font-weight: bold;
+}
+
 .milestones {
     display: flex;
     justify-content: space-around;
@@ -79,7 +87,7 @@ h1 {
 
 .toggle-btn {
     position: absolute;
-    right: 20px;
+    right: 20px; /* Move the button to the right */
     top: 0;
     background-color: #00ccff;
     border: none;
@@ -106,60 +114,4 @@ h1 {
         transform: scaleX(1.02);
         box-shadow: 0px 0px 20px #00ccff;
     }
-}
-
-/* Editor Section */
-.editor {
-    margin-top: 30px;
-    background-color: #222;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 15px #00ccff;
-}
-
-.editor h2 {
-    color: #00ccff;
-    text-shadow: 0px 0px 10px #00ccff;
-    margin-bottom: 15px;
-}
-
-.editor-fields {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.editor label,
-.editor h3 {
-    color: #ccc;
-    margin: 10px 0;
-}
-
-.editor input[type="text"],
-.editor select {
-    padding: 8px;
-    border: none;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 300px;
-    margin-bottom: 10px;
-    background-color: #333;
-    color: #ccc;
-}
-
-.editor button {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background-color: #00ccff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    color: #1a1a1a;
-    font-weight: bold;
-    box-shadow: 0px 0px 10px #00ccff;
-    transition: all 0.3s ease;
-}
-
-.editor button:hover {
-    background-color: #0055ff;
 }
