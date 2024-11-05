@@ -218,3 +218,84 @@ function importData(event) {
     };
     reader.readAsText(file);
 }
+
+// Adding event listener for title editing
+document.addEventListener("DOMContentLoaded", function() {
+    const titleInput = document.getElementById("page-title");
+    const titleHeading = document.querySelector("h1");
+    
+    // Update title in real-time
+    titleInput.addEventListener("input", function() {
+        titleHeading.textContent = titleInput.value || "The steward's Responsibilities";
+    });
+});
+
+// Enhanced Export Function to include title heading
+function exportData() {
+    const titleHeading = document.querySelector("h1").textContent;
+    const goals = [];
+
+    document.querySelectorAll(".goal").forEach(goal => {
+        const goalData = {
+            name: goal.querySelector("h2").textContent,
+            milestones: []
+        };
+        
+        goal.querySelectorAll(".milestone").forEach(milestone => {
+            goalData.milestones.push({
+                completed: milestone.checked,
+                value: milestone.value
+            });
+        });
+        
+        goals.push(goalData);
+    });
+
+    const data = {
+        title: titleHeading,
+        goals: goals
+    };
+    
+    const dataStr = JSON.stringify(data);
+    const blob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "exported_data.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Enhanced Import Function to load title heading
+function importData(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const data = JSON.parse(e.target.result);
+
+        if (data.title) {
+            document.querySelector("h1").textContent = data.title;
+            document.getElementById("page-title").value = data.title;
+        }
+
+        if (data.goals) {
+            data.goals.forEach((goalData, index) => {
+                const goalElement = document.querySelector("#goal" + (index + 1));
+                if (goalElement && goalData.name) {
+                    goalElement.querySelector("h2").textContent = goalData.name;
+                }
+                goalData.milestones.forEach((milestoneData, mIndex) => {
+                    const milestone = goalElement.querySelectorAll(".milestone")[mIndex];
+                    if (milestone) milestone.checked = milestoneData.completed;
+                });
+            });
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Attach new export and import functions to buttons
+document.getElementById("export-button").onclick = exportData;
+document.getElementById("import-button").addEventListener("change", importData);

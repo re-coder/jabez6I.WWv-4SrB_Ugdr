@@ -163,3 +163,9 @@ h1 {
 .editor button:hover {
     background-color: #0055ff;
 }
+
+/* Styling for the title input field in the editor */
+.editor input[type="text"]#page-title {
+    margin-bottom: 15px;
+    font-weight: bold;
+}
