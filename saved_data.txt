@@ -1,26 +1,26 @@
 {
   "goals": [
     {
-      "goalName": "Goal 1 Toggle Descriptions",
+      "goalName": "Marbeh - Replacing Tuition",
       "milestones": [
         {
-          "name": "Milestone 1",
+          "name": "1",
           "value": "20"
         },
         {
-          "name": "Milestone 2",
+          "name": "2",
           "value": "40"
         },
         {
-          "name": "Milestone 3",
+          "name": "3",
           "value": "60"
         },
         {
-          "name": "Milestone 4",
+          "name": "4",
           "value": "80"
         },
         {
-          "name": "Milestone 5",
+          "name": "5",
           "value": "100"
         }
       ]
@@ -51,15 +51,15 @@
       "milestones": [
         {
           "name": "Milestone 1",
-          "value": "10"
+          "value": "33"
         },
         {
           "name": "Milestone 2",
-          "value": "20"
+          "value": "66"
         },
         {
           "name": "Milestone 3",
-          "value": "50"
+          "value": "100"
         }
       ]
     }
