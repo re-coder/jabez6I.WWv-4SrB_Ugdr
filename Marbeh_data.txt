@@ -53,13 +53,7 @@
           "name": "undefined",
           "completed": false,
           "value": "100"
-        },
-        {
-          "name": "Milestone 5",
-          "completed": false,
-          "value": "50"
-        }
-      ]
+        }      ]
     },
     {
       "name": "Awareness and Opportunity Sourcing",
@@ -78,13 +72,7 @@
           "name": "Meet even more people & refine materials",
           "completed": false,
           "value": "99"
-        },
-        {
-          "name": "Milestone 4",
-          "completed": false,
-          "value": "40"
-        }
-      ]
+        }      ]
     }
   ]
 }
