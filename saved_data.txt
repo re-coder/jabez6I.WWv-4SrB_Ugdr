@@ -1,14 +1,14 @@
 {
   "goals": [
     {
-      "goalName": "Marbeh",
+      "goalName": "Goal 1 Toggle Descriptions",
       "milestones": [
         {
-          "name": "1",
+          "name": "Milestone 1",
           "value": "20"
         },
         {
-          "name": "2",
+          "name": "Milestone 2",
           "value": "40"
         },
         {
@@ -51,15 +51,15 @@
       "milestones": [
         {
           "name": "Milestone 1",
-          "value": "33"
+          "value": "10"
         },
         {
           "name": "Milestone 2",
-          "value": "66"
+          "value": "20"
         },
         {
           "name": "Milestone 3",
-          "value": "100"
+          "value": "50"
         }
       ]
     }
