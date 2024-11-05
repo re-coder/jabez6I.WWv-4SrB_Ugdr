@@ -7,7 +7,7 @@
 body {
     background: linear-gradient(120deg, #0a0a0a, #1a1a1a);
     color: #ccc;
-    font-family: 'Orbitron', sans-serif; /* Use a futuristic font like Orbitron */
+    font-family: 'Orbitron', sans-serif;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,12 +27,13 @@ body {
 h1 {
     font-size: 2rem;
     margin-bottom: 20px;
-    color: #00ff00;
-    text-shadow: 0px 0px 10px #00ff00; /* Neon glow effect */
+    color: #00ccff;
+    text-shadow: 0px 0px 10px #00ccff;
 }
 
 .goal {
     margin-bottom: 40px;
+    position: relative;
 }
 
 .progress-bar-container {
@@ -41,16 +42,27 @@ h1 {
     background-color: #333;
     border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0px 0px 10px #00ff00; /* Neon glow effect */
+    box-shadow: 0px 0px 10px #00ccff;
+    position: relative;
 }
 
 .progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #00ff00, #007700);
-    box-shadow: 0px 0px 15px #00ff00; /* Neon glow effect */
+    background: linear-gradient(90deg, #00ccff, #7000ff);
+    box-shadow: 0px 0px 15px #00ccff;
     transition: width 0.4s ease;
-    animation: pulse 2s infinite alternate; /* Pulsing animation */
+    animation: pulse 2s infinite alternate;
+}
+
+.progress-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    color: #1a1a1a;
+    font-weight: bold;
 }
 
 .milestones {
@@ -69,35 +81,37 @@ h1 {
 
 .milestones input[type="checkbox"] {
     margin-right: 8px;
-    accent-color: #00ff00;
-    box-shadow: 0px 0px 8px #00ff00; /* Neon glow effect for checkboxes */
+    accent-color: #00ccff;
+    box-shadow: 0px 0px 8px #00ccff;
 }
 
 .toggle-btn {
-    background-color: #00ff00;
+    position: absolute;
+    right: 20px; /* Move the button to the right */
+    top: 0;
+    background-color: #00ccff;
     border: none;
     color: #1a1a1a;
     padding: 5px 10px;
     font-size: 0.9rem;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 10px;
-    box-shadow: 0px 0px 10px #00ff00;
+    box-shadow: 0px 0px 10px #00ccff;
     transition: all 0.3s ease;
 }
 
 .toggle-btn:hover {
-    background-color: #007700;
-    box-shadow: 0px 0px 15px #00ff00;
+    background-color: #0055ff;
+    box-shadow: 0px 0px 15px #00ccff;
 }
 
 @keyframes pulse {
     from {
         transform: scaleX(1);
-        box-shadow: 0px 0px 10px #00ff00;
+        box-shadow: 0px 0px 10px #00ccff;
     }
     to {
         transform: scaleX(1.02);
-        box-shadow: 0px 0px 20px #00ff00;
+        box-shadow: 0px 0px 20px #00ccff;
     }
 }

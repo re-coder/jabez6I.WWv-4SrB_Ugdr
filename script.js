@@ -9,7 +9,11 @@ document.querySelectorAll('.toggle-btn').forEach(button => {
 function handleMilestoneCheck(event) {
     const milestone = event.target;
     const goalId = milestone.getAttribute('data-goal');
+    const milestoneValue = parseInt(milestone.value, 10);
+    const progressBar = document.getElementById(`progress-bar-${goalId}`);
+    const progressText = document.createElement('span');
 
+    // Ensure sequential completion
     if (!isSequential(milestone)) {
         alert("Complete milestones in order.");
         milestone.checked = false;
@@ -17,9 +21,10 @@ function handleMilestoneCheck(event) {
     }
 
     updateProgress(goalId);
-    playSound();
+    playSound(); // Play sound effect when a milestone is checked
 }
 
+// Ensure milestones are completed in sequence
 function isSequential(milestone) {
     const goalId = milestone.getAttribute('data-goal');
     const milestones = document.querySelectorAll(`.milestone[data-goal="${goalId}"]`);
@@ -45,9 +50,10 @@ function updateProgress(goalId) {
         }
     });
     
-    total = Math.min(total, 100);
+    total = Math.min(total, 100); // Cap the progress at 100%
     progressBar.style.width = `${total}%`;
 
+    // Update percentage display
     progressText.className = 'progress-percentage';
     progressText.textContent = `${total}%`;
     progressBar.appendChild(progressText);
@@ -56,10 +62,16 @@ function updateProgress(goalId) {
 function toggleDescriptions(event) {
     const goalId = event.target.getAttribute('data-goal');
     const milestones = document.getElementById(`milestones-${goalId}`);
-    milestones.style.display = (milestones.style.display === 'none') ? 'flex' : 'none';
+
+    if (milestones.style.display === 'none') {
+        milestones.style.display = 'flex';
+    } else {
+        milestones.style.display = 'none';
+    }
 }
 
+// Function to play sound on milestone check
 function playSound() {
-    const audio = new Audio('https://example.com/sci-fi-sound.mp3'); // Replace with a sci-fi sound URL
+    const audio = new Audio('https://example.com/sci-fi-sound.mp3'); // Replace with a URL of a sci-fi sound effect
     audio.play();
 }
