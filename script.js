@@ -1,45 +1,65 @@
 document.querySelectorAll('.milestone').forEach(checkbox => {
-    checkbox.addEventListener('change', updateProgress);
+    checkbox.addEventListener('change', handleMilestoneCheck);
 });
 
 document.querySelectorAll('.toggle-btn').forEach(button => {
     button.addEventListener('click', toggleDescriptions);
 });
 
+function handleMilestoneCheck(event) {
+    const milestone = event.target;
+    const goalId = milestone.getAttribute('data-goal');
+
+    if (!isSequential(milestone)) {
+        alert("Complete milestones in order.");
+        milestone.checked = false;
+        return;
+    }
+
+    updateProgress(goalId);
+    playSound();
+}
+
+function isSequential(milestone) {
+    const goalId = milestone.getAttribute('data-goal');
+    const milestones = document.querySelectorAll(`.milestone[data-goal="${goalId}"]`);
+    const index = Array.from(milestones).indexOf(milestone);
+
+    for (let i = 0; i < index; i++) {
+        if (!milestones[i].checked) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function updateProgress(goalId) {
+    const progressBar = document.getElementById(`progress-bar-${goalId}`);
+    const milestones = document.querySelectorAll(`.milestone[data-goal="${goalId}"]`);
+    const progressText = progressBar.querySelector('.progress-percentage') || document.createElement('span');
+
+    let total = 0;
+    milestones.forEach(milestone => {
+        if (milestone.checked) {
+            total += parseInt(milestone.value, 10);
+        }
+    });
+    
+    total = Math.min(total, 100);
+    progressBar.style.width = `${total}%`;
+
+    progressText.className = 'progress-percentage';
+    progressText.textContent = `${total}%`;
+    progressBar.appendChild(progressText);
+}
+
 function toggleDescriptions(event) {
     const goalId = event.target.getAttribute('data-goal');
     const milestones = document.getElementById(`milestones-${goalId}`);
-
-    if (milestones.style.display === 'none') {
-        milestones.style.display = 'flex'; // Show if currently hidden
-    } else {
-        milestones.style.display = 'none'; // Hide if currently shown
-    }
+    milestones.style.display = (milestones.style.display === 'none') ? 'flex' : 'none';
 }
 
-function updateProgress(event) {
-    const goalId = event.target.getAttribute('data-goal');
-    const progressBar = document.getElementById(`progress-bar-${goalId}`);
-    const milestones = document.querySelectorAll(`.milestone[data-goal="${goalId}"]`);
-    
-    let targetWidth = 0;
-    milestones.forEach(milestone => {
-        if (milestone.checked) {
-            targetWidth += parseInt(milestone.value, 10);
-        }
-    });
-    targetWidth = Math.min(targetWidth, 100);
-
-    let currentWidth = parseFloat(progressBar.style.width) || 0;
-    const step = targetWidth > currentWidth ? 1 : -1;
-
-    const interval = setInterval(() => {
-        currentWidth += step;
-        progressBar.style.width = `${currentWidth}%`;
-
-        if ((step > 0 && currentWidth >= targetWidth) || (step < 0 && currentWidth <= targetWidth)) {
-            clearInterval(interval);
-            progressBar.style.width = `${targetWidth}%`;
-        }
-    }, 10);
+function playSound() {
+    const audio = new Audio('https://example.com/sci-fi-sound.mp3'); // Replace with a sci-fi sound URL
+    audio.play();
 }
