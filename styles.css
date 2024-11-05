@@ -169,3 +169,15 @@ h1 {
     margin-bottom: 15px;
     font-weight: bold;
 }
+
+/* Styling for the "Add Milestone" button */
+#add-milestone {
+    background-color: red;
+    color: #fff;
+    font-weight: bold;
+    box-shadow: 0px 0px 10px #ff0000;
+}
+
+#add-milestone:hover {
+    background-color: darkred;
+}
