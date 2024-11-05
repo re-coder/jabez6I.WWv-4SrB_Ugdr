@@ -1,77 +1,90 @@
-document.querySelectorAll('.milestone').forEach(checkbox => {
-    checkbox.addEventListener('change', handleMilestoneCheck);
+// Initialize event listeners for milestone checkboxes and goal editor
+document.addEventListener("DOMContentLoaded", () => {
+    initializeMilestoneListeners();
+    initializeEditor();
 });
 
-document.querySelectorAll('.toggle-btn').forEach(button => {
-    button.addEventListener('click', toggleDescriptions);
-});
-
-function handleMilestoneCheck(event) {
-    const milestone = event.target;
-    const goalId = milestone.getAttribute('data-goal');
-    const milestoneValue = parseInt(milestone.value, 10);
-    const progressBar = document.getElementById(`progress-bar-${goalId}`);
-    const progressText = document.createElement('span');
-
-    // Ensure sequential completion
-    if (!isSequential(milestone)) {
-        alert("Complete milestones in order.");
-        milestone.checked = false;
-        return;
-    }
-
-    updateProgress(goalId);
-    playSound(); // Play sound effect when a milestone is checked
+// Function to initialize milestone listeners for progress calculation
+function initializeMilestoneListeners() {
+    const milestoneCheckboxes = document.querySelectorAll(".milestone");
+    milestoneCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener("change", updateProgressBar);
+    });
 }
 
-// Ensure milestones are completed in sequence
-function isSequential(milestone) {
-    const goalId = milestone.getAttribute('data-goal');
-    const milestones = document.querySelectorAll(`.milestone[data-goal="${goalId}"]`);
-    const index = Array.from(milestones).indexOf(milestone);
-
-    for (let i = 0; i < index; i++) {
-        if (!milestones[i].checked) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function updateProgress(goalId) {
-    const progressBar = document.getElementById(`progress-bar-${goalId}`);
-    const milestones = document.querySelectorAll(`.milestone[data-goal="${goalId}"]`);
-    const progressText = progressBar.querySelector('.progress-percentage') || document.createElement('span');
-
+// Function to calculate and update the progress bar for each goal
+function updateProgressBar() {
+    const goalNumber = this.dataset.goal;
+    const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
+    const checkboxes = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`);
     let total = 0;
-    milestones.forEach(milestone => {
-        if (milestone.checked) {
-            total += parseInt(milestone.value, 10);
+
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            total += parseInt(checkbox.value);
         }
     });
-    
-    total = Math.min(total, 100); // Cap the progress at 100%
+
+    // Update the progress bar width
     progressBar.style.width = `${total}%`;
+}
+// Function to initialize the editor section for editing goals
+function initializeEditor() {
+    const goalSelect = document.getElementById("goal-select");
+    const goalNameInput = document.getElementById("goal-name");
+    const milestoneEditor = document.getElementById("milestone-editor");
+    const updateGoalButton = document.getElementById("update-goal");
 
-    // Update percentage display
-    progressText.className = 'progress-percentage';
-    progressText.textContent = `${total}%`;
-    progressBar.appendChild(progressText);
+    goalSelect.addEventListener("change", loadGoalData);
+    updateGoalButton.addEventListener("click", updateGoalData);
+
+    // Load initial data for the selected goal
+    loadGoalData();
 }
 
-function toggleDescriptions(event) {
-    const goalId = event.target.getAttribute('data-goal');
-    const milestones = document.getElementById(`milestones-${goalId}`);
+// Function to load data into the editor fields based on the selected goal
+function loadGoalData() {
+    const selectedGoal = document.getElementById("goal-select").value;
+    const goalName = document.getElementById(`goal-name-${selectedGoal}`).textContent;
+    document.getElementById("goal-name").value = goalName;
 
-    if (milestones.style.display === 'none') {
-        milestones.style.display = 'flex';
-    } else {
-        milestones.style.display = 'none';
-    }
+    // Load milestone values into the editor for the selected goal
+    const milestoneEditor = document.getElementById("milestone-editor");
+    milestoneEditor.innerHTML = ""; // Clear previous milestones
+
+    const milestones = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`);
+    milestones.forEach((milestone, index) => {
+        const milestoneValue = milestone.value;
+
+        const milestoneInput = document.createElement("input");
+        milestoneInput.type = "number";
+        milestoneInput.value = milestoneValue;
+        milestoneInput.classList.add("milestone-input");
+        milestoneInput.dataset.index = index;
+        milestoneInput.dataset.goal = selectedGoal;
+
+        const milestoneLabel = document.createElement("label");
+        milestoneLabel.textContent = `Milestone ${index + 1} Value (%):`;
+        milestoneLabel.appendChild(milestoneInput);
+        milestoneEditor.appendChild(milestoneLabel);
+    });
 }
+// Function to update goal and milestone data based on editor inputs
+function updateGoalData() {
+    const selectedGoal = document.getElementById("goal-select").value;
 
-// Function to play sound on milestone check
-function playSound() {
-    const audio = new Audio('https://example.com/sci-fi-sound.mp3'); // Replace with a URL of a sci-fi sound effect
-    audio.play();
+    // Update the goal name
+    const goalNameInput = document.getElementById("goal-name").value;
+    document.getElementById(`goal-name-${selectedGoal}`).textContent = goalNameInput;
+
+    // Update each milestone's percentage value
+    const milestoneInputs = document.querySelectorAll(".milestone-input");
+    milestoneInputs.forEach(input => {
+        const milestoneIndex = input.dataset.index;
+        const milestoneCheckbox = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`)[milestoneIndex];
+        milestoneCheckbox.value = input.value;
+    });
+
+    // Reset progress calculation based on new values
+    updateProgressBar.call(document.querySelector(`.milestone[data-goal="${selectedGoal}"]`));
 }
