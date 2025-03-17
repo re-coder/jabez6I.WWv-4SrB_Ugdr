@@ -1,99 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The steward's Responsibilities</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The steward's Responsibilities</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>The steward's Responsibilities</h1>
+  <div class="container">
+    <h1>The steward's Responsibilities</h1>
 
-        <div class="goal" id="goal1">
-            <h2 id="goal-name-1">Goal 1 <button class="toggle-btn" data-goal="1">Toggle Descriptions</button></h2>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar-1">
-                    <span class="progress-percentage" id="progress-percentage-1">0%</span>
-                </div>
-            </div>
-            <div class="milestones" id="milestones-1">
-                <label><input type="checkbox" class="milestone" data-goal="1" value="20"> Milestone 1</label>
-                <label><input type="checkbox" class="milestone" data-goal="1" value="40"> Milestone 2</label>
-                <label><input type="checkbox" class="milestone" data-goal="1" value="60"> Milestone 3</label>
-                <label><input type="checkbox" class="milestone" data-goal="1" value="80"> Milestone 4</label>
-                <label><input type="checkbox" class="milestone" data-goal="1" value="100"> Milestone 5</label>
-            </div>
+    <!-- Goals Container -->
+    <div id="goals-container">
+      <!-- Existing Goal 1 -->
+      <div class="goal" id="goal1">
+        <h2 id="goal-name-1">
+          Goal 1 <button class="toggle-btn" data-goal="1">Toggle Descriptions</button>
+        </h2>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar-1">
+            <span class="progress-percentage" id="progress-percentage-1">0%</span>
+          </div>
         </div>
-
-        <div class="goal" id="goal2">
-            <h2 id="goal-name-2">Goal 2 <button class="toggle-btn" data-goal="2">Toggle Descriptions</button></h2>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar-2">
-                    <span class="progress-percentage" id="progress-percentage-2">0%</span>
-                </div>
-            </div>
-            <div class="milestones" id="milestones-2">
-                <label><input type="checkbox" class="milestone" data-goal="2" value="25"> Milestone 1</label>
-                <label><input type="checkbox" class="milestone" data-goal="2" value="50"> Milestone 2</label>
-                <label><input type="checkbox" class="milestone" data-goal="2" value="75"> Milestone 3</label>
-                <label><input type="checkbox" class="milestone" data-goal="2" value="100"> Milestone 4</label>
-            </div>
+        <div class="milestones" id="milestones-1">
+          <label><input type="checkbox" class="milestone" data-goal="1" value="20" /> Milestone 1</label>
+          <label><input type="checkbox" class="milestone" data-goal="1" value="40" /> Milestone 2</label>
+          <label><input type="checkbox" class="milestone" data-goal="1" value="60" /> Milestone 3</label>
+          <label><input type="checkbox" class="milestone" data-goal="1" value="80" /> Milestone 4</label>
+          <label><input type="checkbox" class="milestone" data-goal="1" value="100" /> Milestone 5</label>
         </div>
+      </div>
 
-        <div class="goal" id="goal3">
-            <h2 id="goal-name-3">Goal 3 <button class="toggle-btn" data-goal="3">Toggle Descriptions</button></h2>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progress-bar-3">
-                    <span class="progress-percentage" id="progress-percentage-3">0%</span>
-                </div>
-            </div>
-            <div class="milestones" id="milestones-3">
-                <label><input type="checkbox" class="milestone" data-goal="3" value="33"> Milestone 1</label>
-                <label><input type="checkbox" class="milestone" data-goal="3" value="66"> Milestone 2</label>
-                <label><input type="checkbox" class="milestone" data-goal="3" value="100"> Milestone 3</label>
-            </div>
+      <!-- Existing Goal 2 -->
+      <div class="goal" id="goal2">
+        <h2 id="goal-name-2">
+          Goal 2 <button class="toggle-btn" data-goal="2">Toggle Descriptions</button>
+        </h2>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar-2">
+            <span class="progress-percentage" id="progress-percentage-2">0%</span>
+          </div>
         </div>
-
-        <!-- Editor Section -->
-        <div class="editor">
-            <h2>Edit Page Title and Goals</h2>
-<label for="page-title">Page Title:</label>
-<input type="text" id="page-title" placeholder="Enter new title heading">
-            <label for="goal-select">Select Goal:</label>
-            <select id="goal-select">
-                <option value="1">Goal 1</option>
-                <option value="2">Goal 2</option>
-                <option value="3">Goal 3</option>
-            </select>
-
-            <div class="editor-fields">
-                <label for="goal-name">Goal Name:</label>
-                <input type="text" id="goal-name" placeholder="Enter new goal name">
-
-                <h3>Edit Milestones</h3>
-                <div id="milestone-editor">
-                    <!-- Dynamic milestone fields will be generated here by JavaScript -->
-                </div>
-
-                <button id="add-milestone">Add Milestone</button>
-<button id="update-goal">Update Goal</button>
-            </div>
-
-            <!-- Export and Import Buttons -->
-            <button id="export-button">Export to .txt</button>
-            <input type="file" id="import-button" accept=".txt">
+        <div class="milestones" id="milestones-2">
+          <label><input type="checkbox" class="milestone" data-goal="2" value="25" /> Milestone 1</label>
+          <label><input type="checkbox" class="milestone" data-goal="2" value="50" /> Milestone 2</label>
+          <label><input type="checkbox" class="milestone" data-goal="2" value="75" /> Milestone 3</label>
+          <label><input type="checkbox" class="milestone" data-goal="2" value="100" /> Milestone 4</label>
         </div>
+      </div>
 
-        <!-- Sound Files -->
-        <audio id="goal1-sound" src="sounds/goal1-sound.mp3"></audio>
-        <audio id="goal2-sound" src="sounds/goal2-sound.mp3"></audio>
-        <audio id="goal3-sound" src="sounds/goal3-sound.mp3"></audio>
-
+      <!-- Existing Goal 3 -->
+      <div class="goal" id="goal3">
+        <h2 id="goal-name-3">
+          Goal 3 <button class="toggle-btn" data-goal="3">Toggle Descriptions</button>
+        </h2>
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progress-bar-3">
+            <span class="progress-percentage" id="progress-percentage-3">0%</span>
+          </div>
+        </div>
+        <div class="milestones" id="milestones-3">
+          <label><input type="checkbox" class="milestone" data-goal="3" value="33" /> Milestone 1</label>
+          <label><input type="checkbox" class="milestone" data-goal="3" value="66" /> Milestone 2</label>
+          <label><input type="checkbox" class="milestone" data-goal="3" value="100" /> Milestone 3</label>
+        </div>
+      </div>
     </div>
+    <!-- End Goals Container -->
 
-    <script src="script.js"></script>
+    <!-- Editor Section -->
+    <div class="editor">
+      <h2>Edit Page Title and Goals</h2>
+      <label for="page-title">Page Title:</label>
+      <input type="text" id="page-title" placeholder="Enter new title heading" />
+
+      <label for="goal-select">Select Goal:</label>
+      <select id="goal-select">
+        <option value="1">Goal 1</option>
+        <option value="2">Goal 2</option>
+        <option value="3">Goal 3</option>
+      </select>
+      <button id="add-goal">Add New Goal</button>
+
+      <div class="editor-fields">
+        <label for="goal-name">Goal Name:</label>
+        <input type="text" id="goal-name" placeholder="Enter new goal name" />
+
+        <h3>Edit Milestones</h3>
+        <div id="milestone-editor">
+          <!-- Dynamic milestone fields will be generated here by JavaScript -->
+        </div>
+
+        <button id="add-milestone">Add Milestone</button>
+        <button id="update-goal">Update Goal</button>
+      </div>
+
+      <!-- Export and Import Buttons -->
+      <button id="export-button">Export to .txt</button>
+      <input type="file" id="import-button" accept=".txt" />
+    </div>
+    <!-- End Editor Section -->
+
+    <!-- Sound Files -->
+    <audio id="goal1-sound" src="sounds/goal1-sound.mp3"></audio>
+    <audio id="goal2-sound" src="sounds/goal2-sound.mp3"></audio>
+    <audio id="goal3-sound" src="sounds/goal3-sound.mp3"></audio>
+  </div>
+
+  <div class="version-number">v4.3</div>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
-    <div class="version-number">v4.3</div>

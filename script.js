@@ -1,313 +1,340 @@
-// Initialize event listeners for milestone checkboxes, toggle buttons, and editor
-document.addEventListener("DOMContentLoaded", () => {
-    initializeMilestoneListeners();
-    initializeEditor();
-    initializeToggleButtons();
-    loadAudioEffects();
-    setupImportExportButtons();
-});
+// Global Variables
+let currentGoalCount = 3;
+const maxGoalCount = 20;
 
-// Sound effects for each goal
+// Audio effects for each goal (predefined for initial goals)
 const audioEffects = {
-    1: new Audio("sounds/goal1-sound.mp3"),
-    2: new Audio("sounds/goal2-sound.mp3"),
-    3: new Audio("sounds/goal3-sound.mp3")
+  1: new Audio("sounds/goal1-sound.mp3"),
+  2: new Audio("sounds/goal2-sound.mp3"),
+  3: new Audio("sounds/goal3-sound.mp3")
 };
 
-// Function to load audio effects for each goal
+// Load audio for initial goals
 function loadAudioEffects() {
-    for (let key in audioEffects) {
-        audioEffects[key].load();
-    }
+  for (let key in audioEffects) {
+    audioEffects[key].load();
+  }
 }
 
-// Function to initialize milestone listeners for progress calculation
-function initializeMilestoneListeners() {
-    const milestoneCheckboxes = document.querySelectorAll(".milestone");
-    milestoneCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", () => {
-            updateProgressBar(checkbox.dataset.goal);
-        });
-    });
-}
+// Initialize listeners on DOM content load
+document.addEventListener("DOMContentLoaded", () => {
+  initializeMilestoneListeners();
+  initializeEditor();
+  initializeToggleButtons();
+  loadAudioEffects();
+  setupImportExportButtons();
 
-// Function to toggle milestone visibility
-function initializeToggleButtons() {
-    const toggleButtons = document.querySelectorAll(".toggle-btn");
-    toggleButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const goalId = button.getAttribute("data-goal");
-            const milestones = document.getElementById(`milestones-${goalId}`);
-            milestones.classList.toggle("hidden");
-        });
-    });
-}
+  // Add listener for new goal button
+  document.getElementById("add-goal").addEventListener("click", addNewGoal);
 
-// Function to calculate and update the progress bar for each goal
-function updateProgressBar(goalNumber) {
-    const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
-    const progressPercentageDisplay = document.getElementById(`progress-percentage-${goalNumber}`);
-    const checkboxes = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`);
-    let total = 0;
-
-    // Enforce sequential milestone completion
-    let lastCompleted = true;
-    checkboxes.forEach((checkbox, index) => {
-        if (lastCompleted && checkbox.checked) {
-            total += parseInt(checkbox.value);
-            lastCompleted = true;
-        } else if (!lastCompleted) {
-            checkbox.checked = false; // Uncheck milestones if previous ones are not completed
-        } else {
-            lastCompleted = false;
-        }
-    });
-
-    // Update the progress bar width and percentage display
-    progressBar.style.width = `${total}%`;
-    progressPercentageDisplay.textContent = `${total}%`;
-
-    // Play corresponding sound effect
-    if (total > 0) {
-        audioEffects[goalNumber].play();
-    }
-}
-
-// Function to initialize the editor section for editing goals
-function initializeEditor() {
-    const goalSelect = document.getElementById("goal-select");
-    const goalNameInput = document.getElementById("goal-name");
-    const milestoneEditor = document.getElementById("milestone-editor");
-    const updateGoalButton = document.getElementById("update-goal");
-
-    goalSelect.addEventListener("change", loadGoalData);
-    updateGoalButton.addEventListener("click", updateGoalData);
-
-    // Load initial data for the selected goal
-    loadGoalData();
-}
-
-// Function to load data into the editor fields based on the selected goal
-function loadGoalData() {
-    const selectedGoal = document.getElementById("goal-select").value;
-    const goalName = document.getElementById(`goal-name-${selectedGoal}`).textContent;
-    document.getElementById("goal-name").value = goalName;
-
-    // Load milestone names and percentages into the editor for the selected goal
-    const milestoneEditor = document.getElementById("milestone-editor");
-    milestoneEditor.innerHTML = ""; // Clear previous milestones
-
-    const milestones = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`);
-    milestones.forEach((milestone, index) => {
-        const milestoneName = milestone.parentElement.textContent.trim();
-        const milestoneValue = milestone.value;
-
-        const milestoneLabel = document.createElement("label");
-        milestoneLabel.textContent = `Milestone ${index + 1} Name:`;
-
-        const milestoneInput = document.createElement("input");
-        milestoneInput.type = "text";
-        milestoneInput.value = milestoneName;
-        milestoneInput.classList.add("milestone-input");
-        milestoneInput.dataset.index = index;
-        milestoneInput.dataset.goal = selectedGoal;
-
-        const milestoneValueLabel = document.createElement("label");
-        milestoneValueLabel.textContent = `Milestone ${index + 1} Percentage:`;
-
-        const milestoneValueInput = document.createElement("input");
-        milestoneValueInput.type = "number";
-        milestoneValueInput.value = milestoneValue;
-        milestoneValueInput.classList.add("milestone-value-input");
-        milestoneValueInput.dataset.index = index;
-        milestoneValueInput.dataset.goal = selectedGoal;
-
-        milestoneLabel.appendChild(milestoneInput);
-        milestoneValueLabel.appendChild(milestoneValueInput);
-
-        milestoneEditor.appendChild(milestoneLabel);
-        milestoneEditor.appendChild(milestoneValueLabel);
-    });
-}
-
-// Function to update goal and milestone data based on editor inputs
-function updateGoalData() {
-    const selectedGoal = document.getElementById("goal-select").value;
-
-    // Update the goal name
-    const goalNameInput = document.getElementById("goal-name").value;
-    document.getElementById(`goal-name-${selectedGoal}`).textContent = goalNameInput;
-
-    // Update each milestone's name and percentage value
-    const milestoneInputs = document.querySelectorAll(".milestone-input");
-    const milestoneValueInputs = document.querySelectorAll(".milestone-value-input");
-    
-    milestoneInputs.forEach((input, index) => {
-        const milestoneIndex = input.dataset.index;
-        const milestoneCheckbox = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`)[milestoneIndex];
-        const milestoneLabel = milestoneCheckbox.parentElement;
-
-        // Update the milestone name
-        milestoneLabel.childNodes[1].textContent = input.value;
-
-        // Update the milestone percentage value
-        const milestoneValue = milestoneValueInputs[index].value;
-        milestoneCheckbox.value = milestoneValue;
-    });
-
-    // Reset progress calculation to reflect any updates
-    updateProgressBar(selectedGoal);
-}
-
-// Function to set up export and import buttons
-function setupImportExportButtons() {
-    const exportButton = document.getElementById("export-button");
-    const importButton = document.getElementById("import-button");
-
-    exportButton.addEventListener("click", exportData);
-    importButton.addEventListener("change", importData);
-}
-
-// Export goal and milestone data to a .txt file
-function exportData() {
-    const data = { goals: [] };
-
-    for (let i = 1; i <= 3; i++) {
-        const goalName = document.getElementById(`goal-name-${i}`).textContent;
-        const milestones = Array.from(document.querySelectorAll(`.milestone[data-goal="${i}"]`)).map((milestone, index) => ({
-            name: milestone.parentElement.textContent.trim(),
-            value: milestone.value
-        }));
-        data.goals.push({ goalName, milestones });
-    }
-
-    const textContent = JSON.stringify(data, null, 2);
-    const blob = new Blob([textContent], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "saved_data.txt";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-}
-
-// Import goal and milestone data from a .txt file
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-        try {
-            const data = JSON.parse(e.target.result);
-            data.goals.forEach((goal, goalIndex) => {
-                const goalNumber = goalIndex + 1;
-                document.getElementById(`goal-name-${goalNumber}`).textContent = goal.goalName;
-                goal.milestones.forEach((milestone, milestoneIndex) => {
-                    const milestoneCheckbox = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`)[milestoneIndex];
-                    milestoneCheckbox.value = milestone.value;
-                    const milestoneLabel = milestoneCheckbox.parentElement;
-                    milestoneLabel.childNodes[1].textContent = milestone.name;
-                });
-            });
-        } catch (error) {
-            alert("Invalid file format. Please upload a valid JSON .txt file.");
-        }
-    };
-    reader.readAsText(file);
-}
-
-// Adding event listener for title editing
-document.addEventListener("DOMContentLoaded", function() {
-    const titleInput = document.getElementById("page-title");
-    const titleHeading = document.querySelector("h1");
-    
-    // Update title in real-time
-    titleInput.addEventListener("input", function() {
-        titleHeading.textContent = titleInput.value || "The steward's Responsibilities";
-    });
+  // Update title editing listener
+  const titleInput = document.getElementById("page-title");
+  const titleHeading = document.querySelector("h1");
+  titleInput.addEventListener("input", function () {
+    titleHeading.textContent = titleInput.value || "The steward's Responsibilities";
+  });
 });
 
-// Enhanced Export Function with editor text fields
+// Function to add event listeners to milestone checkboxes (for initial goals)
+function initializeMilestoneListeners() {
+  const milestoneCheckboxes = document.querySelectorAll(".milestone");
+  milestoneCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", () => {
+      updateProgressBar(checkbox.dataset.goal);
+    });
+  });
+}
+
+// Function to add event listeners to toggle buttons (for initial goals)
+function initializeToggleButtons() {
+  const toggleButtons = document.querySelectorAll(".toggle-btn");
+  toggleButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const goalId = button.getAttribute("data-goal");
+      const milestones = document.getElementById(`milestones-${goalId}`);
+      milestones.classList.toggle("hidden");
+    });
+  });
+}
+
+// Update progress bar calculation and play sound if applicable
+function updateProgressBar(goalNumber) {
+  const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
+  const progressPercentageDisplay = document.getElementById(`progress-percentage-${goalNumber}`);
+  const checkboxes = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`);
+  let total = 0;
+  let lastCompleted = true;
+  
+  checkboxes.forEach((checkbox, index) => {
+    if (lastCompleted && checkbox.checked) {
+      total += parseInt(checkbox.value);
+      lastCompleted = true;
+    } else if (!lastCompleted) {
+      checkbox.checked = false;
+    } else {
+      lastCompleted = false;
+    }
+  });
+  
+  progressBar.style.width = `${total}%`;
+  progressPercentageDisplay.textContent = `${total}%`;
+  
+  if (total > 0 && audioEffects[goalNumber]) {
+    audioEffects[goalNumber].play();
+  }
+}
+
+// Function to create and append a new goal (up to maxGoalCount)
+function addNewGoal() {
+  if (currentGoalCount >= maxGoalCount) {
+    alert("Maximum number of goals reached.");
+    return;
+  }
+  currentGoalCount++;
+  const goalNumber = currentGoalCount;
+
+  // Create new goal element with default 3 milestones
+  const goalDiv = document.createElement("div");
+  goalDiv.className = "goal";
+  goalDiv.id = "goal" + goalNumber;
+  goalDiv.innerHTML = `
+    <h2 id="goal-name-${goalNumber}">
+      Goal ${goalNumber} <button class="toggle-btn" data-goal="${goalNumber}">Toggle Descriptions</button>
+    </h2>
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progress-bar-${goalNumber}">
+        <span class="progress-percentage" id="progress-percentage-${goalNumber}">0%</span>
+      </div>
+    </div>
+    <div class="milestones" id="milestones-${goalNumber}">
+      <label><input type="checkbox" class="milestone" data-goal="${goalNumber}" value="33" /> Milestone 1</label>
+      <label><input type="checkbox" class="milestone" data-goal="${goalNumber}" value="66" /> Milestone 2</label>
+      <label><input type="checkbox" class="milestone" data-goal="${goalNumber}" value="100" /> Milestone 3</label>
+    </div>
+  `;
+  document.getElementById("goals-container").appendChild(goalDiv);
+
+  // Add event listeners for new goal's checkboxes and toggle button
+  const newCheckboxes = goalDiv.querySelectorAll(".milestone");
+  newCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", () => {
+      updateProgressBar(checkbox.dataset.goal);
+    });
+  });
+  const newToggle = goalDiv.querySelector(".toggle-btn");
+  newToggle.addEventListener("click", () => {
+    const goalId = newToggle.getAttribute("data-goal");
+    const milestones = document.getElementById(`milestones-${goalId}`);
+    milestones.classList.toggle("hidden");
+  });
+
+  // Update the goal select dropdown in the editor
+  const goalSelect = document.getElementById("goal-select");
+  const newOption = document.createElement("option");
+  newOption.value = goalNumber;
+  newOption.textContent = "Goal " + goalNumber;
+  goalSelect.appendChild(newOption);
+
+  // Optionally, add a default audio effect for the new goal if none exists
+  if (!audioEffects[goalNumber]) {
+    audioEffects[goalNumber] = new Audio("sounds/goal1-sound.mp3");
+    audioEffects[goalNumber].load();
+  }
+}
+
+// Editor initialization: load and update goal data in the editor
+function initializeEditor() {
+  const goalSelect = document.getElementById("goal-select");
+  const goalNameInput = document.getElementById("goal-name");
+  const milestoneEditor = document.getElementById("milestone-editor");
+  const updateGoalButton = document.getElementById("update-goal");
+
+  goalSelect.addEventListener("change", loadGoalData);
+  updateGoalButton.addEventListener("click", updateGoalData);
+
+  // Load initial data for the selected goal
+  loadGoalData();
+}
+
+// Load goal and milestone data into the editor fields based on selection
+function loadGoalData() {
+  const selectedGoal = document.getElementById("goal-select").value;
+  const goalName = document.getElementById(`goal-name-${selectedGoal}`).textContent;
+  document.getElementById("goal-name").value = goalName;
+
+  // Load milestone names and percentages for the selected goal
+  const milestoneEditor = document.getElementById("milestone-editor");
+  milestoneEditor.innerHTML = "";
+  const milestones = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`);
+  milestones.forEach((milestone, index) => {
+    const milestoneName = milestone.parentElement.textContent.trim();
+    const milestoneValue = milestone.value;
+
+    const milestoneLabel = document.createElement("label");
+    milestoneLabel.textContent = `Milestone ${index + 1} Name:`;
+
+    const milestoneInput = document.createElement("input");
+    milestoneInput.type = "text";
+    milestoneInput.value = milestoneName;
+    milestoneInput.classList.add("milestone-input");
+    milestoneInput.dataset.index = index;
+    milestoneInput.dataset.goal = selectedGoal;
+
+    const milestoneValueLabel = document.createElement("label");
+    milestoneValueLabel.textContent = `Milestone ${index + 1} Percentage:`;
+
+    const milestoneValueInput = document.createElement("input");
+    milestoneValueInput.type = "number";
+    milestoneValueInput.value = milestoneValue;
+    milestoneValueInput.classList.add("milestone-value-input");
+    milestoneValueInput.dataset.index = index;
+    milestoneValueInput.dataset.goal = selectedGoal;
+
+    milestoneLabel.appendChild(milestoneInput);
+    milestoneValueLabel.appendChild(milestoneValueInput);
+
+    milestoneEditor.appendChild(milestoneLabel);
+    milestoneEditor.appendChild(milestoneValueLabel);
+  });
+}
+
+// Update goal and milestone data based on editor inputs
+function updateGoalData() {
+  const selectedGoal = document.getElementById("goal-select").value;
+  const goalNameInput = document.getElementById("goal-name").value;
+  document.getElementById(`goal-name-${selectedGoal}`).textContent = goalNameInput;
+
+  const milestoneInputs = document.querySelectorAll(".milestone-input");
+  const milestoneValueInputs = document.querySelectorAll(".milestone-value-input");
+  
+  milestoneInputs.forEach((input, index) => {
+    const milestoneIndex = input.dataset.index;
+    const milestoneCheckbox = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`)[milestoneIndex];
+    const milestoneLabel = milestoneCheckbox.parentElement;
+    milestoneLabel.childNodes[1].textContent = input.value;
+    const milestoneValue = milestoneValueInputs[index].value;
+    milestoneCheckbox.value = milestoneValue;
+  });
+
+  updateProgressBar(selectedGoal);
+}
+
+// Setup export and import button event listeners
+function setupImportExportButtons() {
+  document.getElementById("export-button").onclick = exportData;
+  document.getElementById("import-button").addEventListener("change", importData);
+}
+
+// Enhanced Export Function: exports title and all goals dynamically
 function exportData() {
-    const titleHeading = document.querySelector("h1").textContent;
-    const goals = [];
+  const titleHeading = document.querySelector("h1").textContent;
+  const goals = [];
+  document.querySelectorAll(".goal").forEach((goal, index) => {
+    const goalData = {
+      name: goal.querySelector("h2").textContent.trim(),
+      milestones: []
+    };
+    goal.querySelectorAll(".milestone").forEach((milestone, mIndex) => {
+      const milestoneLabel = milestone.parentElement;
+      goalData.milestones.push({
+        name: milestoneLabel.textContent.trim(),
+        completed: milestone.checked,
+        value: milestone.value
+      });
+    });
+    goals.push(goalData);
+  });
 
-    document.querySelectorAll(".goal").forEach(goal => {
-        const goalData = {
-            name: goal.querySelector("h2").textContent.trim(),
-            milestones: []
-        };
+  const data = {
+    title: titleHeading,
+    goals: goals
+  };
 
-        goal.querySelectorAll(".milestone").forEach(milestone => {
-            goalData.milestones.push({
-                name: milestone.parentNode.textContent.trim(), // Milestone label text
-                completed: milestone.checked,                  // Checked state
-                value: milestone.value                         // Milestone percentage count
-            });
+  const dataStr = JSON.stringify(data, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "exported_data.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Enhanced Import Function: imports data and recreates goals accordingly
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = JSON.parse(e.target.result);
+    
+    // Update title
+    if (data.title) {
+      document.querySelector("h1").textContent = data.title;
+      const titleInput = document.getElementById("page-title");
+      if (titleInput) titleInput.value = data.title;
+    }
+    
+    // Clear current goals and goal selector
+    const goalsContainer = document.getElementById("goals-container");
+    goalsContainer.innerHTML = "";
+    const goalSelect = document.getElementById("goal-select");
+    goalSelect.innerHTML = "";
+    currentGoalCount = 0;
+    
+    if (data.goals) {
+      data.goals.forEach((goalData, index) => {
+        currentGoalCount++;
+        const goalNumber = currentGoalCount;
+        const goalDiv = document.createElement("div");
+        goalDiv.className = "goal";
+        goalDiv.id = "goal" + goalNumber;
+        const toggleBtn = `<button class="toggle-btn" data-goal="${goalNumber}">Toggle Descriptions</button>`;
+        goalDiv.innerHTML = `
+          <h2 id="goal-name-${goalNumber}">${goalData.name} ${toggleBtn}</h2>
+          <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar-${goalNumber}">
+              <span class="progress-percentage" id="progress-percentage-${goalNumber}">0%</span>
+            </div>
+          </div>
+          <div class="milestones" id="milestones-${goalNumber}"></div>
+        `;
+        const milestonesDiv = goalDiv.querySelector(".milestones");
+        goalData.milestones.forEach((milestoneData, mIndex) => {
+          const label = document.createElement("label");
+          label.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" value="${milestoneData.value}"> ${milestoneData.name}`;
+          if(milestoneData.completed) {
+            label.querySelector("input").checked = true;
+          }
+          milestonesDiv.appendChild(label);
+        });
+        goalsContainer.appendChild(goalDiv);
+
+        // Add event listeners for new goal's checkboxes and toggle button
+        const newCheckboxes = goalDiv.querySelectorAll(".milestone");
+        newCheckboxes.forEach(checkbox => {
+          checkbox.addEventListener("change", () => {
+            updateProgressBar(checkbox.dataset.goal);
+          });
+        });
+        const newToggle = goalDiv.querySelector(".toggle-btn");
+        newToggle.addEventListener("click", () => {
+          const goalId = newToggle.getAttribute("data-goal");
+          const milestones = document.getElementById(`milestones-${goalId}`);
+          milestones.classList.toggle("hidden");
         });
 
-        goals.push(goalData);
-    });
+        // Add option to the goal-select dropdown
+        const newOption = document.createElement("option");
+        newOption.value = goalNumber;
+        newOption.textContent = "Goal " + goalNumber;
+        goalSelect.appendChild(newOption);
 
-    const data = {
-        title: titleHeading,
-        goals: goals
-    };
-
-    const dataStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "exported_data.txt";
-    a.click();
-    URL.revokeObjectURL(url);
+        // Update progress bar
+        updateProgressBar(goalNumber);
+      });
+    }
+  };
+  reader.readAsText(file);
 }
-
-// Enhanced Import Function to load text field defaults for editor screen
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const data = JSON.parse(e.target.result);
-
-        // Set title heading in display and editor field
-        if (data.title) {
-            document.querySelector("h1").textContent = data.title;
-            const titleInput = document.getElementById("page-title");
-            if (titleInput) titleInput.value = data.title; // Set default text
-        }
-
-        // Load goals, including editor defaults for names and milestones
-        if (data.goals) {
-            data.goals.forEach((goalData, index) => {
-                const goalElement = document.querySelector("#goal" + (index + 1));
-                const goalNameInput = document.getElementById("goal-name");
-
-                if (goalElement && goalData.name) {
-                    goalElement.querySelector("h2").textContent = goalData.name;
-                    if (goalNameInput) goalNameInput.value = goalData.name; // Set goal name in editor
-                }
-
-                goalData.milestones.forEach((milestoneData, mIndex) => {
-                    const milestone = goalElement.querySelectorAll(".milestone")[mIndex];
-                    if (milestone) {
-                        milestone.checked = milestoneData.completed; // Checked state
-                        milestone.value = milestoneData.value;
-                        milestone.parentNode.childNodes[1].nodeValue = ` ${milestoneData.name}`; // Update milestone name
-                    }
-                });
-            });
-        }
-    };
-    reader.readAsText(file);
-}
-
-// Re-attach updated export and import functions to buttons
-document.getElementById("export-button").onclick = exportData;
-document.getElementById("import-button").addEventListener("change", importData);
