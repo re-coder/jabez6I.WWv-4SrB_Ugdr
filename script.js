@@ -1,6 +1,7 @@
 // Global Variables
 let currentGoalCount = 3;
 const maxGoalCount = 20;
+const maxMilestonesPerGoal = 20;
 
 // Audio effects for each goal (predefined for initial goals)
 const audioEffects = {
@@ -26,6 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Add listener for new goal button
   document.getElementById("add-goal").addEventListener("click", addNewGoal);
+  // Add listener for new milestone button
+  document.getElementById("add-milestone").addEventListener("click", addMilestone);
 
   // Update title editing listener
   const titleInput = document.getElementById("page-title");
@@ -140,6 +143,36 @@ function addNewGoal() {
     audioEffects[goalNumber] = new Audio("sounds/goal1-sound.mp3");
     audioEffects[goalNumber].load();
   }
+}
+
+// Function to add a new milestone to the currently selected goal (up to maxMilestonesPerGoal)
+function addMilestone() {
+  const selectedGoal = document.getElementById("goal-select").value;
+  const milestoneContainer = document.getElementById("milestones-" + selectedGoal);
+  const currentMilestones = milestoneContainer.querySelectorAll(".milestone");
+  
+  if (currentMilestones.length >= maxMilestonesPerGoal) {
+    alert("Maximum number of milestones reached for this goal.");
+    return;
+  }
+  
+  const newMilestoneNumber = currentMilestones.length + 1;
+  const defaultValue = "10"; // default percentage value for new milestone
+  
+  // Create new milestone label with checkbox
+  const newLabel = document.createElement("label");
+  newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${selectedGoal}" value="${defaultValue}" /> Milestone ${newMilestoneNumber}`;
+  
+  // Append the new milestone to the container
+  milestoneContainer.appendChild(newLabel);
+  
+  // Add event listener for the new checkbox
+  newLabel.querySelector("input").addEventListener("change", () => {
+    updateProgressBar(selectedGoal);
+  });
+  
+  // Refresh the editor's milestone view for the selected goal
+  loadGoalData();
 }
 
 // Editor initialization: load and update goal data in the editor
