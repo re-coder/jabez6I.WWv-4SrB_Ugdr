@@ -11,8 +11,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
   
   .container {
@@ -130,35 +130,29 @@
     box-shadow: 0px 0px 15px #00ccff;
   }
   
-  /* Editor Section */
-  .editor {
-    margin-top: 30px;
+  /* Mini Editor (per goal) */
+  .mini-editor {
     background-color: #222;
-    padding: 20px;
+    padding: 15px;
+    margin-top: 15px;
+    border: 2px solid #00ccff;
     border-radius: 10px;
-    box-shadow: 0px 0px 15px #00ccff;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
-  .editor h2 {
-    color: #00ccff;
-    text-shadow: 0px 0px 10px #00ccff;
-    margin-bottom: 15px;
-  }
-  
-  .editor-fields {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .editor label,
-  .editor h3 {
+  .mini-editor label {
     color: #ccc;
-    margin: 10px 0;
+    margin: 5px 0;
+    font-size: 0.9rem;
+    display: block;
   }
   
-  .editor input[type="text"],
-  .editor select {
+  .mini-editor input[type="text"],
+  .mini-editor input[type="number"],
+  .mini-editor select {
     padding: 8px;
     border: none;
     border-radius: 5px;
@@ -167,40 +161,90 @@
     margin-bottom: 10px;
     background-color: #333;
     color: #ccc;
+    display: block;
   }
   
-  .editor button {
-    margin-top: 15px;
-    padding: 10px 20px;
+  .mini-editor button {
+    padding: 8px 16px;
     background-color: #00ccff;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
     color: #1a1a1a;
     font-weight: bold;
+    margin: 5px 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
     box-shadow: 0px 0px 10px #00ccff;
-    transition: all 0.3s ease;
   }
   
-  .editor button:hover {
+  .mini-editor button:hover {
     background-color: #0055ff;
   }
   
-  /* Styling for the title input field in the editor */
-  .editor input[type="text"]#page-title {
-    margin-bottom: 15px;
-    font-weight: bold;
+  /* Mini Milestone Editor Container */
+  .mini-milestone-editor {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   
-  /* Styling for the "Add Milestone" button */
-  #add-milestone {
-    background-color: red;
-    color: #fff;
-    font-weight: bold;
-    box-shadow: 0px 0px 10px #ff0000;
+  /* General Editor Section (for global controls) */
+  .general-editor {
+    background-color: #222;
+    padding: 15px;
+    margin-top: 30px;
+    border: 2px solid #00ccff;
+    border-radius: 10px;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
   }
   
-  #add-milestone:hover {
-    background-color: darkred;
+  .general-editor label {
+    color: #ccc;
+    margin: 5px 0;
+    font-size: 0.9rem;
+    display: block;
+  }
+  
+  .general-editor input[type="text"],
+  .general-editor input[type="number"],
+  .general-editor select {
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 10px;
+    background-color: #333;
+    color: #ccc;
+    display: block;
+  }
+  
+  .general-editor button {
+    padding: 8px 16px;
+    background-color: #00ccff;
+    border: none;
+    border-radius: 5px;
+    color: #1a1a1a;
+    font-weight: bold;
+    margin: 5px 5px 5px 0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 0px 10px #00ccff;
+  }
+  
+  .general-editor button:hover {
+    background-color: #0055ff;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 600px) {
+    .mini-editor, .general-editor {
+      width: 90%;
+      max-width: none;
+    }
   }
   

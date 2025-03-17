@@ -12,140 +12,92 @@
 
     <!-- Goals Container -->
     <div id="goals-container">
-      <!-- Existing Goal 1 -->
+      <!-- Goal 1 -->
       <div class="goal" id="goal1">
         <h2 id="goal-name-1">
-          Goal 1 <button class="toggle-btn" data-goal="1">Toggle Descriptions</button>
+          <span class="goal-title">Goal 1</span>
+          <button class="toggle-btn" data-goal="1">Toggle Descriptions</button>
         </h2>
-        <!-- Milestones Above the Progress Bar (even-index milestones) -->
-        <div class="milestones milestones-above" id="milestones-above-1">
-          <label>
-            <input type="checkbox" class="milestone" data-goal="1" data-index="2" value="40" />
-            Milestone 2
-          </label>
-          <label>
-            <input type="checkbox" class="milestone" data-goal="1" data-index="4" value="80" />
-            Milestone 4
-          </label>
-        </div>
+        <!-- Milestones Above the Progress Bar (empty by default) -->
+        <div class="milestones milestones-above" id="milestones-above-1"></div>
         <!-- Progress Bar -->
         <div class="progress-bar-container">
           <div class="progress-bar" id="progress-bar-1">
             <span class="progress-percentage" id="progress-percentage-1">0%</span>
           </div>
         </div>
-        <!-- Milestones Below the Progress Bar (odd-index milestones) -->
-        <div class="milestones milestones-below" id="milestones-below-1">
-          <label>
-            <input type="checkbox" class="milestone" data-goal="1" data-index="1" value="20" />
-            Milestone 1
-          </label>
-          <label>
-            <input type="checkbox" class="milestone" data-goal="1" data-index="3" value="60" />
-            Milestone 3
-          </label>
-          <label>
-            <input type="checkbox" class="milestone" data-goal="1" data-index="5" value="100" />
-            Milestone 5
-          </label>
+        <!-- Milestones Below the Progress Bar (empty by default) -->
+        <div class="milestones milestones-below" id="milestones-below-1"></div>
+        <!-- Mini Editor for Goal 1 -->
+        <div class="mini-editor" id="mini-editor-1">
+          <label for="mini-goal-name-1">Edit Goal Name:</label>
+          <input type="text" id="mini-goal-name-1" value="Goal 1">
+          <div class="mini-milestone-editor" id="mini-milestone-editor-1">
+            <!-- Dynamic milestone fields will be populated by JS -->
+          </div>
+          <button class="mini-add-milestone" data-goal="1">Add Milestone</button>
+          <button class="mini-update-goal" data-goal="1">Update Goal</button>
         </div>
       </div>
 
-      <!-- Existing Goal 2 -->
+      <!-- Goal 2 -->
       <div class="goal" id="goal2">
         <h2 id="goal-name-2">
-          Goal 2 <button class="toggle-btn" data-goal="2">Toggle Descriptions</button>
+          <span class="goal-title">Goal 2</span>
+          <button class="toggle-btn" data-goal="2">Toggle Descriptions</button>
         </h2>
-        <div class="milestones milestones-above" id="milestones-above-2">
-          <label>
-            <input type="checkbox" class="milestone" data-goal="2" data-index="2" value="50" />
-            Milestone 2
-          </label>
-          <label>
-            <input type="checkbox" class="milestone" data-goal="2" data-index="4" value="100" />
-            Milestone 4
-          </label>
-        </div>
+        <div class="milestones milestones-above" id="milestones-above-2"></div>
         <div class="progress-bar-container">
           <div class="progress-bar" id="progress-bar-2">
             <span class="progress-percentage" id="progress-percentage-2">0%</span>
           </div>
         </div>
-        <div class="milestones milestones-below" id="milestones-below-2">
-          <label>
-            <input type="checkbox" class="milestone" data-goal="2" data-index="1" value="25" />
-            Milestone 1
-          </label>
-          <label>
-            <input type="checkbox" class="milestone" data-goal="2" data-index="3" value="75" />
-            Milestone 3
-          </label>
+        <div class="milestones milestones-below" id="milestones-below-2"></div>
+        <!-- Mini Editor for Goal 2 -->
+        <div class="mini-editor" id="mini-editor-2">
+          <label for="mini-goal-name-2">Edit Goal Name:</label>
+          <input type="text" id="mini-goal-name-2" value="Goal 2">
+          <div class="mini-milestone-editor" id="mini-milestone-editor-2"></div>
+          <button class="mini-add-milestone" data-goal="2">Add Milestone</button>
+          <button class="mini-update-goal" data-goal="2">Update Goal</button>
         </div>
       </div>
 
-      <!-- Existing Goal 3 -->
+      <!-- Goal 3 -->
       <div class="goal" id="goal3">
         <h2 id="goal-name-3">
-          Goal 3 <button class="toggle-btn" data-goal="3">Toggle Descriptions</button>
+          <span class="goal-title">Goal 3</span>
+          <button class="toggle-btn" data-goal="3">Toggle Descriptions</button>
         </h2>
-        <div class="milestones milestones-above" id="milestones-above-3">
-          <label>
-            <input type="checkbox" class="milestone" data-goal="3" data-index="2" value="66" />
-            Milestone 2
-          </label>
-        </div>
+        <div class="milestones milestones-above" id="milestones-above-3"></div>
         <div class="progress-bar-container">
           <div class="progress-bar" id="progress-bar-3">
             <span class="progress-percentage" id="progress-percentage-3">0%</span>
           </div>
         </div>
-        <div class="milestones milestones-below" id="milestones-below-3">
-          <label>
-            <input type="checkbox" class="milestone" data-goal="3" data-index="1" value="33" />
-            Milestone 1
-          </label>
-          <label>
-            <input type="checkbox" class="milestone" data-goal="3" data-index="3" value="100" />
-            Milestone 3
-          </label>
+        <div class="milestones milestones-below" id="milestones-below-3"></div>
+        <!-- Mini Editor for Goal 3 -->
+        <div class="mini-editor" id="mini-editor-3">
+          <label for="mini-goal-name-3">Edit Goal Name:</label>
+          <input type="text" id="mini-goal-name-3" value="Goal 3">
+          <div class="mini-milestone-editor" id="mini-milestone-editor-3"></div>
+          <button class="mini-add-milestone" data-goal="3">Add Milestone</button>
+          <button class="mini-update-goal" data-goal="3">Update Goal</button>
         </div>
       </div>
     </div>
     <!-- End Goals Container -->
 
-    <!-- Editor Section -->
-    <div class="editor">
-      <h2>Edit Page Title and Goals</h2>
+    <!-- General Editor Section (for global controls only) -->
+    <div class="general-editor">
+      <h2>General Editor</h2>
       <label for="page-title">Page Title:</label>
-      <input type="text" id="page-title" placeholder="Enter new title heading" />
-
-      <label for="goal-select">Select Goal:</label>
-      <select id="goal-select">
-        <option value="1">Goal 1</option>
-        <option value="2">Goal 2</option>
-        <option value="3">Goal 3</option>
-      </select>
-      <button id="add-goal">Add New Goal</button>
-
-      <div class="editor-fields">
-        <label for="goal-name">Goal Name:</label>
-        <input type="text" id="goal-name" placeholder="Enter new goal name" />
-
-        <h3>Edit Milestones</h3>
-        <div id="milestone-editor">
-          <!-- Dynamic milestone fields will be generated here by JavaScript -->
-        </div>
-
-        <!-- Button to add new milestones for the selected goal -->
-        <button id="add-milestone">Add Milestone</button>
-        <button id="update-goal">Update Goal</button>
-      </div>
-
-      <!-- Export and Import Buttons -->
+      <input type="text" id="page-title" placeholder="Enter new title heading">
+      <!-- New Save button for the page heading -->
+      <button id="save-page-title">Save Page Title</button>
       <button id="export-button">Export to .txt</button>
-      <input type="file" id="import-button" accept=".txt" />
+      <input type="file" id="import-button" accept=".txt">
     </div>
-    <!-- End Editor Section -->
 
     <!-- Sound Files -->
     <audio id="goal1-sound" src="sounds/goal1-sound.mp3"></audio>
@@ -153,8 +105,7 @@
     <audio id="goal3-sound" src="sounds/goal3-sound.mp3"></audio>
   </div>
 
-  <div class="version-number">v4.5</div>
-
+  <div class="version-number">v4.3</div>
   <script src="script.js"></script>
 </body>
 </html>
