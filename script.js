@@ -25,12 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAudioEffects();
   setupImportExportButtons();
 
-  // Add listener for new goal button
+  // Listener for "Add New Goal" button
   document.getElementById("add-goal").addEventListener("click", addNewGoal);
-  // Add listener for new milestone button
+  // Listener for "Add Milestone" button
   document.getElementById("add-milestone").addEventListener("click", addMilestone);
 
-  // Update title editing listener
+  // Title editing listener
   const titleInput = document.getElementById("page-title");
   const titleHeading = document.querySelector("h1");
   titleInput.addEventListener("input", function () {
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Function to add event listeners to milestone checkboxes (for initial goals)
+// Add event listeners to all existing milestone checkboxes
 function initializeMilestoneListeners() {
   const milestoneCheckboxes = document.querySelectorAll(".milestone");
   milestoneCheckboxes.forEach(checkbox => {
@@ -48,27 +48,27 @@ function initializeMilestoneListeners() {
   });
 }
 
-// Function to add event listeners to toggle buttons (for initial goals)
+// Add event listeners to all toggle buttons (for hiding/showing milestone containers)
 function initializeToggleButtons() {
   const toggleButtons = document.querySelectorAll(".toggle-btn");
   toggleButtons.forEach(button => {
     button.addEventListener("click", () => {
       const goalId = button.getAttribute("data-goal");
-      const milestones = document.getElementById(`milestones-${goalId}`);
-      milestones.classList.toggle("hidden");
+      const aboveContainer = document.getElementById(`milestones-above-${goalId}`);
+      const belowContainer = document.getElementById(`milestones-below-${goalId}`);
+      aboveContainer.classList.toggle("hidden");
+      belowContainer.classList.toggle("hidden");
     });
   });
 }
 
-// Update progress bar calculation and play sound if applicable
+// Update progress bar by sorting milestones (by data-index) and calculating total
 function updateProgressBar(goalNumber) {
-  const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
-  const progressPercentageDisplay = document.getElementById(`progress-percentage-${goalNumber}`);
-  const checkboxes = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`);
+  let checkboxes = Array.from(document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`));
+  checkboxes.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
   let total = 0;
   let lastCompleted = true;
-  
-  checkboxes.forEach((checkbox, index) => {
+  checkboxes.forEach(checkbox => {
     if (lastCompleted && checkbox.checked) {
       total += parseInt(checkbox.value);
       lastCompleted = true;
@@ -78,16 +78,29 @@ function updateProgressBar(goalNumber) {
       lastCompleted = false;
     }
   });
-  
+  const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
+  const progressPercentageDisplay = document.getElementById(`progress-percentage-${goalNumber}`);
   progressBar.style.width = `${total}%`;
   progressPercentageDisplay.textContent = `${total}%`;
-  
   if (total > 0 && audioEffects[goalNumber]) {
     audioEffects[goalNumber].play();
   }
 }
 
-// Function to create and append a new goal (up to maxGoalCount)
+// Helper: Add a milestone to a specific goal with a given index, value, and label
+function addMilestoneToGoal(goalNumber, milestoneIndex, value, labelText) {
+  const aboveContainer = document.getElementById("milestones-above-" + goalNumber);
+  const belowContainer = document.getElementById("milestones-below-" + goalNumber);
+  let container = (milestoneIndex % 2 === 1) ? belowContainer : aboveContainer;
+  const newLabel = document.createElement("label");
+  newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${milestoneIndex}" value="${value}" /> ${labelText}`;
+  container.appendChild(newLabel);
+  newLabel.querySelector("input").addEventListener("change", () => {
+    updateProgressBar(goalNumber);
+  });
+}
+
+// Create and append a new goal (up to maxGoalCount)
 function addNewGoal() {
   if (currentGoalCount >= maxGoalCount) {
     alert("Maximum number of goals reached.");
@@ -95,8 +108,6 @@ function addNewGoal() {
   }
   currentGoalCount++;
   const goalNumber = currentGoalCount;
-
-  // Create new goal element with default 3 milestones
   const goalDiv = document.createElement("div");
   goalDiv.className = "goal";
   goalDiv.id = "goal" + goalNumber;
@@ -104,32 +115,30 @@ function addNewGoal() {
     <h2 id="goal-name-${goalNumber}">
       Goal ${goalNumber} <button class="toggle-btn" data-goal="${goalNumber}">Toggle Descriptions</button>
     </h2>
+    <div class="milestones milestones-above" id="milestones-above-${goalNumber}"></div>
     <div class="progress-bar-container">
       <div class="progress-bar" id="progress-bar-${goalNumber}">
         <span class="progress-percentage" id="progress-percentage-${goalNumber}">0%</span>
       </div>
     </div>
-    <div class="milestones" id="milestones-${goalNumber}">
-      <label><input type="checkbox" class="milestone" data-goal="${goalNumber}" value="33" /> Milestone 1</label>
-      <label><input type="checkbox" class="milestone" data-goal="${goalNumber}" value="66" /> Milestone 2</label>
-      <label><input type="checkbox" class="milestone" data-goal="${goalNumber}" value="100" /> Milestone 3</label>
-    </div>
+    <div class="milestones milestones-below" id="milestones-below-${goalNumber}"></div>
   `;
   document.getElementById("goals-container").appendChild(goalDiv);
 
-  // Add event listeners for new goal's checkboxes and toggle button
-  const newCheckboxes = goalDiv.querySelectorAll(".milestone");
-  newCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", () => {
-      updateProgressBar(checkbox.dataset.goal);
-    });
-  });
+  // Attach toggle functionality for the new goal
   const newToggle = goalDiv.querySelector(".toggle-btn");
   newToggle.addEventListener("click", () => {
     const goalId = newToggle.getAttribute("data-goal");
-    const milestones = document.getElementById(`milestones-${goalId}`);
-    milestones.classList.toggle("hidden");
+    const aboveContainer = document.getElementById(`milestones-above-${goalId}`);
+    const belowContainer = document.getElementById(`milestones-below-${goalId}`);
+    aboveContainer.classList.toggle("hidden");
+    belowContainer.classList.toggle("hidden");
   });
+
+  // Add default 3 milestones (milestone 1 & 3 go below; milestone 2 goes above)
+  addMilestoneToGoal(goalNumber, 1, "33", "Milestone 1");
+  addMilestoneToGoal(goalNumber, 2, "66", "Milestone 2");
+  addMilestoneToGoal(goalNumber, 3, "100", "Milestone 3");
 
   // Update the goal select dropdown in the editor
   const goalSelect = document.getElementById("goal-select");
@@ -145,87 +154,70 @@ function addNewGoal() {
   }
 }
 
-// Function to add a new milestone to the currently selected goal (up to maxMilestonesPerGoal)
+// Add a new milestone to the currently selected goal (up to maxMilestonesPerGoal)
 function addMilestone() {
   const selectedGoal = document.getElementById("goal-select").value;
-  const milestoneContainer = document.getElementById("milestones-" + selectedGoal);
-  const currentMilestones = milestoneContainer.querySelectorAll(".milestone");
-  
-  if (currentMilestones.length >= maxMilestonesPerGoal) {
+  const aboveContainer = document.getElementById("milestones-above-" + selectedGoal);
+  const belowContainer = document.getElementById("milestones-below-" + selectedGoal);
+  const countAbove = aboveContainer.querySelectorAll(".milestone").length;
+  const countBelow = belowContainer.querySelectorAll(".milestone").length;
+  const totalMilestones = countAbove + countBelow;
+  if (totalMilestones >= maxMilestonesPerGoal) {
     alert("Maximum number of milestones reached for this goal.");
     return;
   }
-  
-  const newMilestoneNumber = currentMilestones.length + 1;
-  const defaultValue = "10"; // default percentage value for new milestone
-  
-  // Create new milestone label with checkbox
+  const newMilestoneNumber = totalMilestones + 1;
+  const defaultValue = "10";
+  const milestoneLabelText = "Milestone " + newMilestoneNumber;
+  let container = (newMilestoneNumber % 2 === 1) ? belowContainer : aboveContainer;
   const newLabel = document.createElement("label");
-  newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${selectedGoal}" value="${defaultValue}" /> Milestone ${newMilestoneNumber}`;
-  
-  // Append the new milestone to the container
-  milestoneContainer.appendChild(newLabel);
-  
-  // Add event listener for the new checkbox
+  newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${selectedGoal}" data-index="${newMilestoneNumber}" value="${defaultValue}" /> ${milestoneLabelText}`;
+  container.appendChild(newLabel);
   newLabel.querySelector("input").addEventListener("change", () => {
     updateProgressBar(selectedGoal);
   });
-  
-  // Refresh the editor's milestone view for the selected goal
   loadGoalData();
 }
 
 // Editor initialization: load and update goal data in the editor
 function initializeEditor() {
   const goalSelect = document.getElementById("goal-select");
-  const goalNameInput = document.getElementById("goal-name");
-  const milestoneEditor = document.getElementById("milestone-editor");
   const updateGoalButton = document.getElementById("update-goal");
-
   goalSelect.addEventListener("change", loadGoalData);
   updateGoalButton.addEventListener("click", updateGoalData);
-
-  // Load initial data for the selected goal
   loadGoalData();
 }
 
-// Load goal and milestone data into the editor fields based on selection
+// Load goal and milestone data into the editor (sorted by data-index)
 function loadGoalData() {
   const selectedGoal = document.getElementById("goal-select").value;
   const goalName = document.getElementById(`goal-name-${selectedGoal}`).textContent;
   document.getElementById("goal-name").value = goalName;
-
-  // Load milestone names and percentages for the selected goal
   const milestoneEditor = document.getElementById("milestone-editor");
   milestoneEditor.innerHTML = "";
-  const milestones = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`);
+  let milestones = Array.from(document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`));
+  milestones.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
   milestones.forEach((milestone, index) => {
     const milestoneName = milestone.parentElement.textContent.trim();
     const milestoneValue = milestone.value;
-
     const milestoneLabel = document.createElement("label");
     milestoneLabel.textContent = `Milestone ${index + 1} Name:`;
-
     const milestoneInput = document.createElement("input");
     milestoneInput.type = "text";
     milestoneInput.value = milestoneName;
     milestoneInput.classList.add("milestone-input");
-    milestoneInput.dataset.index = index;
+    milestoneInput.dataset.index = milestone.dataset.index;
     milestoneInput.dataset.goal = selectedGoal;
-
     const milestoneValueLabel = document.createElement("label");
     milestoneValueLabel.textContent = `Milestone ${index + 1} Percentage:`;
-
     const milestoneValueInput = document.createElement("input");
     milestoneValueInput.type = "number";
     milestoneValueInput.value = milestoneValue;
     milestoneValueInput.classList.add("milestone-value-input");
-    milestoneValueInput.dataset.index = index;
+    milestoneValueInput.dataset.index = milestone.dataset.index;
     milestoneValueInput.dataset.goal = selectedGoal;
-
     milestoneLabel.appendChild(milestoneInput);
     milestoneValueLabel.appendChild(milestoneValueInput);
-
     milestoneEditor.appendChild(milestoneLabel);
     milestoneEditor.appendChild(milestoneValueLabel);
   });
@@ -236,19 +228,23 @@ function updateGoalData() {
   const selectedGoal = document.getElementById("goal-select").value;
   const goalNameInput = document.getElementById("goal-name").value;
   document.getElementById(`goal-name-${selectedGoal}`).textContent = goalNameInput;
-
-  const milestoneInputs = document.querySelectorAll(".milestone-input");
-  const milestoneValueInputs = document.querySelectorAll(".milestone-value-input");
+  
+  let milestoneInputs = Array.from(document.querySelectorAll(`.milestone-input[data-goal="${selectedGoal}"]`));
+  milestoneInputs.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
+  let milestoneValueInputs = Array.from(document.querySelectorAll(`.milestone-value-input[data-goal="${selectedGoal}"]`));
+  milestoneValueInputs.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
   
   milestoneInputs.forEach((input, index) => {
     const milestoneIndex = input.dataset.index;
-    const milestoneCheckbox = document.querySelectorAll(`.milestone[data-goal="${selectedGoal}"]`)[milestoneIndex];
-    const milestoneLabel = milestoneCheckbox.parentElement;
-    milestoneLabel.childNodes[1].textContent = input.value;
-    const milestoneValue = milestoneValueInputs[index].value;
-    milestoneCheckbox.value = milestoneValue;
+    let checkbox = document.querySelector(`.milestone[data-goal="${selectedGoal}"][data-index="${milestoneIndex}"]`);
+    if (checkbox) {
+      // Update the parent label’s text (replace the text node) while keeping the checkbox intact.
+      checkbox.parentElement.innerText = input.value;
+      checkbox.parentElement.insertBefore(checkbox, checkbox.parentElement.firstChild);
+      const milestoneValue = milestoneValueInputs[index].value;
+      checkbox.value = milestoneValue;
+    }
   });
-
   updateProgressBar(selectedGoal);
 }
 
@@ -258,16 +254,18 @@ function setupImportExportButtons() {
   document.getElementById("import-button").addEventListener("change", importData);
 }
 
-// Enhanced Export Function: exports title and all goals dynamically
+// Export all data (goals and milestones) to a JSON file
 function exportData() {
   const titleHeading = document.querySelector("h1").textContent;
   const goals = [];
-  document.querySelectorAll(".goal").forEach((goal, index) => {
+  document.querySelectorAll(".goal").forEach((goal) => {
     const goalData = {
       name: goal.querySelector("h2").textContent.trim(),
       milestones: []
     };
-    goal.querySelectorAll(".milestone").forEach((milestone, mIndex) => {
+    let milestones = Array.from(goal.querySelectorAll(".milestone"));
+    milestones.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
+    milestones.forEach((milestone) => {
       const milestoneLabel = milestone.parentElement;
       goalData.milestones.push({
         name: milestoneLabel.textContent.trim(),
@@ -277,12 +275,10 @@ function exportData() {
     });
     goals.push(goalData);
   });
-
   const data = {
     title: titleHeading,
     goals: goals
   };
-
   const dataStr = JSON.stringify(data, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -293,31 +289,25 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-// Enhanced Import Function: imports data and recreates goals accordingly
+// Import data from a JSON file and rebuild the goals and milestones
 function importData(event) {
   const file = event.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function (e) {
     const data = JSON.parse(e.target.result);
-    
-    // Update title
     if (data.title) {
       document.querySelector("h1").textContent = data.title;
       const titleInput = document.getElementById("page-title");
       if (titleInput) titleInput.value = data.title;
     }
-    
-    // Clear current goals and goal selector
     const goalsContainer = document.getElementById("goals-container");
     goalsContainer.innerHTML = "";
     const goalSelect = document.getElementById("goal-select");
     goalSelect.innerHTML = "";
     currentGoalCount = 0;
-    
     if (data.goals) {
-      data.goals.forEach((goalData, index) => {
+      data.goals.forEach((goalData) => {
         currentGoalCount++;
         const goalNumber = currentGoalCount;
         const goalDiv = document.createElement("div");
@@ -326,45 +316,45 @@ function importData(event) {
         const toggleBtn = `<button class="toggle-btn" data-goal="${goalNumber}">Toggle Descriptions</button>`;
         goalDiv.innerHTML = `
           <h2 id="goal-name-${goalNumber}">${goalData.name} ${toggleBtn}</h2>
+          <div class="milestones milestones-above" id="milestones-above-${goalNumber}"></div>
           <div class="progress-bar-container">
             <div class="progress-bar" id="progress-bar-${goalNumber}">
               <span class="progress-percentage" id="progress-percentage-${goalNumber}">0%</span>
             </div>
           </div>
-          <div class="milestones" id="milestones-${goalNumber}"></div>
+          <div class="milestones milestones-below" id="milestones-below-${goalNumber}"></div>
         `;
-        const milestonesDiv = goalDiv.querySelector(".milestones");
+        const aboveContainer = goalDiv.querySelector(".milestones.milestones-above");
+        const belowContainer = goalDiv.querySelector(".milestones.milestones-below");
         goalData.milestones.forEach((milestoneData, mIndex) => {
+          const milestoneNumber = mIndex + 1;
+          let container = (milestoneNumber % 2 === 1) ? belowContainer : aboveContainer;
           const label = document.createElement("label");
-          label.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" value="${milestoneData.value}"> ${milestoneData.name}`;
+          label.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${milestoneNumber}" value="${milestoneData.value}"> ${milestoneData.name}`;
           if(milestoneData.completed) {
             label.querySelector("input").checked = true;
           }
-          milestonesDiv.appendChild(label);
+          container.appendChild(label);
         });
         goalsContainer.appendChild(goalDiv);
-
-        // Add event listeners for new goal's checkboxes and toggle button
-        const newCheckboxes = goalDiv.querySelectorAll(".milestone");
-        newCheckboxes.forEach(checkbox => {
+        const newToggle = goalDiv.querySelector(".toggle-btn");
+        newToggle.addEventListener("click", () => {
+          const goalId = newToggle.getAttribute("data-goal");
+          const aboveContainer = document.getElementById(`milestones-above-${goalId}`);
+          const belowContainer = document.getElementById(`milestones-below-${goalId}`);
+          aboveContainer.classList.toggle("hidden");
+          belowContainer.classList.toggle("hidden");
+        });
+        let checkboxes = goalDiv.querySelectorAll(".milestone");
+        checkboxes.forEach(checkbox => {
           checkbox.addEventListener("change", () => {
             updateProgressBar(checkbox.dataset.goal);
           });
         });
-        const newToggle = goalDiv.querySelector(".toggle-btn");
-        newToggle.addEventListener("click", () => {
-          const goalId = newToggle.getAttribute("data-goal");
-          const milestones = document.getElementById(`milestones-${goalId}`);
-          milestones.classList.toggle("hidden");
-        });
-
-        // Add option to the goal-select dropdown
         const newOption = document.createElement("option");
         newOption.value = goalNumber;
         newOption.textContent = "Goal " + goalNumber;
         goalSelect.appendChild(newOption);
-
-        // Update progress bar
         updateProgressBar(goalNumber);
       });
     }
