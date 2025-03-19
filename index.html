@@ -2,17 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The steward's Responsibilities</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Position the Add Goal button in the top-right corner with the same style as general-editor buttons */
+    #add-goal {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      background-color: #00ccff;
+      border: none;
+      border-radius: 5px;
+      color: #1a1a1a;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0px 0px 10px #00ccff;
+      transition: background-color 0.3s ease;
+    }
+    #add-goal:hover {
+      background-color: #0055ff;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
+    <!-- Single "Add Goal" button at top-right -->
+    <button id="add-goal">Add Goal</button>
+
     <h1>The steward's Responsibilities</h1>
-    <!-- Add Goal Button Container (positioned at the top right but not far right) -->
-    <div class="add-goal-container">
-      <button id="add-goal-button">Add Goal</button>
-    </div>
 
     <!-- Goals Container -->
     <div id="goals-container">
@@ -97,7 +116,6 @@
       <h2>General Editor</h2>
       <label for="page-title">Page Title:</label>
       <input type="text" id="page-title" placeholder="Enter new title heading">
-      <!-- New Save button for the page heading -->
       <button id="save-page-title">Save Page Title</button>
       <button id="export-button">Export to .txt</button>
       <input type="file" id="import-button" accept=".txt">
@@ -109,7 +127,9 @@
     <audio id="goal3-sound" src="sounds/goal3-sound.mp3"></audio>
   </div>
 
+  <!-- Version updated to v4.8 -->
   <div class="version-number">v4.8</div>
+
   <script src="script.js"></script>
 </body>
 </html>
