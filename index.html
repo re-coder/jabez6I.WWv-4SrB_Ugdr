@@ -6,11 +6,9 @@
   <title>The steward's Responsibilities</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    /* Position the Add Goal button in the top-right corner with the same style as general-editor buttons */
-    #add-goal {
+    /* Same corner-button styling for new "Goals" button */
+    .corner-button {
       position: absolute;
-      top: 20px;
-      right: 20px;
       padding: 8px 16px;
       background-color: #00ccff;
       border: none;
@@ -21,15 +19,46 @@
       box-shadow: 0px 0px 10px #00ccff;
       transition: background-color 0.3s ease;
     }
-    #add-goal:hover {
+    .corner-button:hover {
       background-color: #0055ff;
     }
+
+    /* Existing top-left buttons */
+    #general-editor-button {
+      top: 20px;
+      left: 20px;
+    }
+    #hide-all-goals {
+      top: 70px;
+      left: 20px;
+    }
+
+    /* Existing top-right button */
+    #add-goal {
+      top: 20px;
+      right: 20px;
+    }
+
+    /* Removed bottom-left "Goals" button CSS */
+    /*
+    #scroll-to-goals {
+      bottom: 20px;
+      left: 20px;
+    }
+    */
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Single "Add Goal" button at top-right -->
-    <button id="add-goal">Add Goal</button>
+    <!-- Top-left corner buttons -->
+    <button id="general-editor-button" class="corner-button">General Editor</button>
+    <button id="hide-all-goals" class="corner-button">Hide All Goals</button>
+
+    <!-- Top-right corner button -->
+    <button id="add-goal" class="corner-button">Add Goal</button>
+
+    <!-- Removed Bottom-left "Goals" button -->
+    <!-- <button id="scroll-to-goals" class="corner-button">Goals</button> -->
 
     <h1>The steward's Responsibilities</h1>
 
@@ -41,23 +70,17 @@
           <span class="goal-title">Goal 1</span>
           <button class="toggle-btn" data-goal="1">Toggle Descriptions</button>
         </h2>
-        <!-- Milestones Above the Progress Bar (empty by default) -->
         <div class="milestones milestones-above" id="milestones-above-1"></div>
-        <!-- Progress Bar -->
         <div class="progress-bar-container">
           <div class="progress-bar" id="progress-bar-1">
             <span class="progress-percentage" id="progress-percentage-1">0%</span>
           </div>
         </div>
-        <!-- Milestones Below the Progress Bar (empty by default) -->
         <div class="milestones milestones-below" id="milestones-below-1"></div>
-        <!-- Mini Editor for Goal 1 -->
         <div class="mini-editor" id="mini-editor-1">
           <label for="mini-goal-name-1">Edit Goal Name:</label>
           <input type="text" id="mini-goal-name-1" value="Goal 1">
-          <div class="mini-milestone-editor" id="mini-milestone-editor-1">
-            <!-- Dynamic milestone fields will be populated by JS -->
-          </div>
+          <div class="mini-milestone-editor" id="mini-milestone-editor-1"></div>
           <button class="mini-add-milestone" data-goal="1">Add Milestone</button>
           <button class="mini-update-goal" data-goal="1">Update Goal</button>
         </div>
@@ -76,7 +99,6 @@
           </div>
         </div>
         <div class="milestones milestones-below" id="milestones-below-2"></div>
-        <!-- Mini Editor for Goal 2 -->
         <div class="mini-editor" id="mini-editor-2">
           <label for="mini-goal-name-2">Edit Goal Name:</label>
           <input type="text" id="mini-goal-name-2" value="Goal 2">
@@ -99,7 +121,6 @@
           </div>
         </div>
         <div class="milestones milestones-below" id="milestones-below-3"></div>
-        <!-- Mini Editor for Goal 3 -->
         <div class="mini-editor" id="mini-editor-3">
           <label for="mini-goal-name-3">Edit Goal Name:</label>
           <input type="text" id="mini-goal-name-3" value="Goal 3">
@@ -119,6 +140,8 @@
       <button id="save-page-title">Save Page Title</button>
       <button id="export-button">Export to .txt</button>
       <input type="file" id="import-button" accept=".txt">
+      <!-- New "Jump to Goals" button added inside the general editor -->
+      <button id="jump-to-goals">Jump to Goals</button>
     </div>
 
     <!-- Sound Files -->
@@ -128,7 +151,7 @@
   </div>
 
   <!-- Version updated to v4.8 -->
-  <div class="version-number">v4.8</div>
+  <div class="version-number">v4.9</div>
 
   <script src="script.js"></script>
 </body>

@@ -2,6 +2,7 @@
 let currentGoalCount = 3;
 const maxGoalCount = 20;
 const maxMilestonesPerGoal = 20;
+let allGoalsHidden = false; // For "Hide All Goals" toggling
 
 // Audio effects for each goal (predefined for initial goals)
 const audioEffects = {
@@ -28,8 +29,22 @@ document.addEventListener("DOMContentLoaded", () => {
     loadMiniEditor(i);
   }
   initializeMiniEditorButtons();
-  // Add event listener for the Add Goal button (positioned at top right)
+
+  // Add event listener for the Add Goal button
   document.getElementById("add-goal").addEventListener("click", addNewGoal);
+
+  // Existing event listener for General Editor button
+  document.getElementById("general-editor-button").addEventListener("click", () => {
+    document.querySelector(".general-editor").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // Toggle all goals for "Hide All Goals" button
+  document.getElementById("hide-all-goals").addEventListener("click", toggleAllGoals);
+
+  // NEW: When "Jump to Goals" is clicked (button inside the General Editor), scroll to the Goals Container
+  document.getElementById("jump-to-goals").addEventListener("click", () => {
+    document.getElementById("goals-container").scrollIntoView({ behavior: "smooth" });
+  });
 });
 
 // Add event listeners to all existing milestone checkboxes
@@ -42,7 +57,7 @@ function initializeMilestoneListeners() {
   });
 }
 
-// Toggle buttons for showing/hiding milestone containers and mini editor
+// Toggle buttons for showing/hiding milestone containers, progress bar, and mini editor
 function initializeToggleButtons() {
   const toggleButtons = document.querySelectorAll(".toggle-btn");
   toggleButtons.forEach(button => {
@@ -51,8 +66,11 @@ function initializeToggleButtons() {
       const aboveContainer = document.getElementById(`milestones-above-${goalId}`);
       const belowContainer = document.getElementById(`milestones-below-${goalId}`);
       const miniEditor = document.getElementById(`mini-editor-${goalId}`);
+      const progressBarContainer = document.querySelector(`#goal${goalId} .progress-bar-container`);
+
       aboveContainer.classList.toggle("hidden");
       belowContainer.classList.toggle("hidden");
+      progressBarContainer.classList.toggle("hidden");
       if (miniEditor) {
         miniEditor.classList.toggle("hidden");
       }
@@ -98,8 +116,7 @@ function addMilestoneToGoal(goalNumber, milestoneIndex, value, labelText) {
   });
 }
 
-// --- NEW ADD NEW GOAL FUNCTION ---
-// Adds a new goal dynamically up to maxGoalCount.
+// --- ADD NEW GOAL FUNCTION ---
 function addNewGoal() {
   if (currentGoalCount >= maxGoalCount) {
     alert("Maximum number of goals reached.");
@@ -112,8 +129,8 @@ function addNewGoal() {
   goalDiv.className = "goal";
   goalDiv.id = "goal" + goalNumber;
   let toggleBtn = `<button class="toggle-btn" data-goal="${goalNumber}">Toggle Descriptions</button>`;
-  goalDiv.innerHTML = `
-    <h2 id="goal-name-${goalNumber}">
+  goalDiv.innerHTML = 
+    `<h2 id="goal-name-${goalNumber}">
       <span class="goal-title">Goal ${goalNumber}</span>
       ${toggleBtn}
     </h2>
@@ -130,9 +147,9 @@ function addNewGoal() {
       <div class="mini-milestone-editor" id="mini-milestone-editor-${goalNumber}"></div>
       <button class="mini-add-milestone" data-goal="${goalNumber}">Add Milestone</button>
       <button class="mini-update-goal" data-goal="${goalNumber}">Update Goal</button>
-    </div>
-  `;
+    </div>`;
   goalsContainer.appendChild(goalDiv);
+
   // Attach toggle event for new goal
   let newToggle = goalDiv.querySelector(".toggle-btn");
   newToggle.addEventListener("click", () => {
@@ -140,41 +157,40 @@ function addNewGoal() {
     let aboveContainer = document.getElementById("milestones-above-" + goalId);
     let belowContainer = document.getElementById("milestones-below-" + goalId);
     let miniEditor = document.getElementById("mini-editor-" + goalId);
+    let progressBarContainer = document.querySelector(`#goal${goalId} .progress-bar-container`);
+
     aboveContainer.classList.toggle("hidden");
     belowContainer.classList.toggle("hidden");
+    progressBarContainer.classList.toggle("hidden");
     if (miniEditor) {
       miniEditor.classList.toggle("hidden");
     }
   });
+
   // Initialize mini editor for the new goal
   loadMiniEditor(goalNumber);
   // Reinitialize mini editor buttons so the new goal's mini buttons work
   initializeMiniEditorButtons();
 }
 
-// --- MINI EDITOR FUNCTIONS ---
-
-// Load the mini editor for a specific goal
+// MINI EDITOR FUNCTIONS
 function loadMiniEditor(goalNumber) {
   const miniMilestoneEditor = document.getElementById("mini-milestone-editor-" + goalNumber);
   if (!miniMilestoneEditor) return;
   miniMilestoneEditor.innerHTML = "";
-  // Get milestones for this goal and sort them
   let milestones = Array.from(document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`));
   milestones.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
   milestones.forEach((milestone, index) => {
-    // Create input field for milestone name
     const label = document.createElement("label");
     label.textContent = `Milestone ${index + 1} Name:`;
     const input = document.createElement("input");
     input.type = "text";
-    // Use the text from the milestone’s parent label (trim the checkbox text)
     input.value = milestone.parentElement.textContent.trim();
     input.dataset.index = milestone.dataset.index;
     input.dataset.goal = goalNumber;
     miniMilestoneEditor.appendChild(label);
     miniMilestoneEditor.appendChild(input);
-    // Create input field for milestone percentage
+
     const percentLabel = document.createElement("label");
     percentLabel.textContent = `Milestone ${index + 1} Percentage:`;
     const percentInput = document.createElement("input");
@@ -185,7 +201,6 @@ function loadMiniEditor(goalNumber) {
     miniMilestoneEditor.appendChild(percentLabel);
     miniMilestoneEditor.appendChild(percentInput);
   });
-  // Also update the mini goal name field
   const miniGoalNameInput = document.getElementById("mini-goal-name-" + goalNumber);
   const goalTitleSpan = document.querySelector(`#goal-name-${goalNumber} .goal-title`);
   if (miniGoalNameInput && goalTitleSpan) {
@@ -193,18 +208,14 @@ function loadMiniEditor(goalNumber) {
   }
 }
 
-// Update the goal and milestones from the mini editor inputs
 function updateMiniGoal(goalNumber) {
-  // Update goal title
   const miniGoalNameInput = document.getElementById("mini-goal-name-" + goalNumber);
   const goalTitleSpan = document.querySelector(`#goal-name-${goalNumber} .goal-title`);
   if (miniGoalNameInput && goalTitleSpan) {
     goalTitleSpan.textContent = miniGoalNameInput.value;
   }
-  // Update milestones from mini editor fields
   const miniMilestoneEditor = document.getElementById("mini-milestone-editor-" + goalNumber);
   const inputs = miniMilestoneEditor.querySelectorAll("input");
-  // Process inputs in pairs (name and percentage)
   for (let i = 0; i < inputs.length; i += 2) {
     let nameInput = inputs[i];
     let percentInput = inputs[i + 1];
@@ -212,19 +223,16 @@ function updateMiniGoal(goalNumber) {
     let checkbox = document.querySelector(`.milestone[data-goal="${goalNumber}"][data-index="${milestoneIndex}"]`);
     if (checkbox) {
       let parent = checkbox.parentElement;
-      // Remove existing text nodes (except the checkbox) and append updated name
       while (parent.childNodes.length > 1) {
         parent.removeChild(parent.lastChild);
       }
       parent.appendChild(document.createTextNode(" " + nameInput.value));
-      // Update the checkbox value (percentage)
       checkbox.value = percentInput.value;
     }
   }
   updateProgressBar(goalNumber);
 }
 
-// Add a new milestone for a specific goal from its mini editor
 function miniAddMilestone(goalNumber) {
   const above = document.getElementById("milestones-above-" + goalNumber);
   const below = document.getElementById("milestones-below-" + goalNumber);
@@ -238,7 +246,8 @@ function miniAddMilestone(goalNumber) {
   let newIndex = total + 1;
   let defaultValue = "10";
   let labelText = "Milestone " + newIndex;
-  let container = (newIndex % 2 === 1) ? below : above;
+  // Always add to the "below" container for consistency
+  const container = below;
   const newLabel = document.createElement("label");
   newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${newIndex}" value="${defaultValue}" /> ${labelText}`;
   container.appendChild(newLabel);
@@ -248,30 +257,34 @@ function miniAddMilestone(goalNumber) {
   loadMiniEditor(goalNumber);
 }
 
-// Initialize mini editor button event listeners (for all current mini editors)
 function initializeMiniEditorButtons() {
   const miniAddButtons = document.querySelectorAll(".mini-add-milestone");
   miniAddButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      let goal = button.getAttribute("data-goal");
-      miniAddMilestone(goal);
-    });
+    // Attach the event listener only once per button
+    if (!button.dataset.listenerAttached) {
+      button.addEventListener("click", () => {
+        let goal = button.getAttribute("data-goal");
+        miniAddMilestone(goal);
+      });
+      button.dataset.listenerAttached = "true";
+    }
   });
   const miniUpdateButtons = document.querySelectorAll(".mini-update-goal");
   miniUpdateButtons.forEach(button => {
-    button.addEventListener("click", () => {
-      let goal = button.getAttribute("data-goal");
-      updateMiniGoal(goal);
-    });
+    if (!button.dataset.listenerAttached) {
+      button.addEventListener("click", () => {
+        let goal = button.getAttribute("data-goal");
+        updateMiniGoal(goal);
+      });
+      button.dataset.listenerAttached = "true";
+    }
   });
 }
 
-// --- GLOBAL EXPORT/IMPORT FUNCTIONS ---
-
+// GLOBAL EXPORT/IMPORT FUNCTIONS
 function setupExportImport() {
   document.getElementById("export-button").onclick = exportData;
   document.getElementById("import-button").addEventListener("change", importData);
-  // New event listener for saving page title from general editor
   document.getElementById("save-page-title").addEventListener("click", function() {
     const newTitle = document.getElementById("page-title").value;
     document.querySelector("h1").textContent = newTitle;
@@ -334,8 +347,8 @@ function importData(event) {
         goalDiv.className = "goal";
         goalDiv.id = "goal" + goalNumber;
         const toggleBtn = `<button class="toggle-btn" data-goal="${goalNumber}">Toggle Descriptions</button>`;
-        goalDiv.innerHTML = `
-          <h2 id="goal-name-${goalNumber}">
+        goalDiv.innerHTML = 
+          `<h2 id="goal-name-${goalNumber}">
             <span class="goal-title">${goalData.name}</span>
             ${toggleBtn}
           </h2>
@@ -352,10 +365,10 @@ function importData(event) {
             <div class="mini-milestone-editor" id="mini-milestone-editor-${goalNumber}"></div>
             <button class="mini-add-milestone" data-goal="${goalNumber}">Add Milestone</button>
             <button class="mini-update-goal" data-goal="${goalNumber}">Update Goal</button>
-          </div>
-        `;
+          </div>`;
         goalsContainer.appendChild(goalDiv);
-        // Import saved milestones for this goal
+
+        // Import saved milestones
         if (goalData.milestones && goalData.milestones.length > 0) {
           goalData.milestones.forEach((milestoneData, mIndex) => {
             let milestoneNumber = mIndex + 1;
@@ -367,12 +380,13 @@ function importData(event) {
             }
             const label = document.createElement("label");
             label.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${milestoneNumber}" value="${milestoneData.value}"> ${milestoneData.name}`;
-            if(milestoneData.completed) {
+            if (milestoneData.completed) {
               label.querySelector("input").checked = true;
             }
             container.appendChild(label);
           });
         }
+
         // Attach toggle button event
         let newToggle = goalDiv.querySelector(".toggle-btn");
         newToggle.addEventListener("click", () => {
@@ -380,12 +394,16 @@ function importData(event) {
           let aboveContainer = document.getElementById("milestones-above-" + goalId);
           let belowContainer = document.getElementById("milestones-below-" + goalId);
           let miniEditor = document.getElementById("mini-editor-" + goalId);
+          let progressBarContainer = document.querySelector(`#goal${goalId} .progress-bar-container`);
+
           aboveContainer.classList.toggle("hidden");
           belowContainer.classList.toggle("hidden");
+          progressBarContainer.classList.toggle("hidden");
           if (miniEditor) {
             miniEditor.classList.toggle("hidden");
           }
         });
+
         // Add milestone checkbox listeners
         let checkboxes = goalDiv.querySelectorAll(".milestone");
         checkboxes.forEach(checkbox => {
@@ -406,4 +424,27 @@ function importData(event) {
     }
   };
   reader.readAsText(file);
+}
+
+// 3) Hide/Show All Goals at Once
+function toggleAllGoals() {
+  allGoalsHidden = !allGoalsHidden;
+  // For each goal, forcibly hide or show the progress bar, milestone containers, and mini editor
+  document.querySelectorAll(".goal").forEach(goal => {
+    let aboveContainer = goal.querySelector(".milestones-above");
+    let belowContainer = goal.querySelector(".milestones-below");
+    let progressBarContainer = goal.querySelector(".progress-bar-container");
+    let miniEditor = goal.querySelector(".mini-editor");
+    if (allGoalsHidden) {
+      aboveContainer.classList.add("hidden");
+      belowContainer.classList.add("hidden");
+      progressBarContainer.classList.add("hidden");
+      miniEditor.classList.add("hidden");
+    } else {
+      aboveContainer.classList.remove("hidden");
+      belowContainer.classList.remove("hidden");
+      progressBarContainer.classList.remove("hidden");
+      miniEditor.classList.remove("hidden");
+    }
+  });
 }
