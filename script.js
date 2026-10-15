@@ -47,13 +47,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+function normalizeMilestoneValue(rawValue, fallback = 0) {
+  const parsedValue = Number.parseFloat(rawValue);
+  if (!Number.isFinite(parsedValue)) {
+    return fallback;
+  }
+  return Math.min(100, Math.max(0, parsedValue));
+}
+
+function attachMilestoneListener(checkbox) {
+  if (!checkbox || checkbox.dataset.listenerAttached === "true") {
+    return;
+  }
+  checkbox.addEventListener("change", () => {
+    updateProgressBar(checkbox.dataset.goal);
+  });
+  checkbox.dataset.listenerAttached = "true";
+}
+
 // Add event listeners to all existing milestone checkboxes
 function initializeMilestoneListeners() {
   const milestoneCheckboxes = document.querySelectorAll(".milestone");
   milestoneCheckboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", () => {
-      updateProgressBar(checkbox.dataset.goal);
-    });
+    attachMilestoneListener(checkbox);
   });
 }
 
@@ -81,25 +97,26 @@ function initializeToggleButtons() {
 // Update progress bar calculation and play sound if applicable
 function updateProgressBar(goalNumber) {
   let checkboxes = Array.from(document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`));
-  checkboxes.sort((a, b) => parseInt(a.dataset.index) - parseInt(b.dataset.index));
-  let total = 0;
-  let lastCompleted = true;
-  checkboxes.forEach(checkbox => {
-    if (lastCompleted && checkbox.checked) {
-      total += parseInt(checkbox.value);
-      lastCompleted = true;
-    } else if (!lastCompleted) {
-      checkbox.checked = false;
-    } else {
-      lastCompleted = false;
+  checkboxes.sort((a, b) => parseInt(a.dataset.index, 10) - parseInt(b.dataset.index, 10));
+
+  const total = checkboxes.reduce((sum, checkbox) => {
+    if (!checkbox.checked) {
+      return sum;
     }
-  });
+    return sum + normalizeMilestoneValue(checkbox.value, 0);
+  }, 0);
+
+  const cappedTotal = Math.min(100, total);
   const progressBar = document.getElementById(`progress-bar-${goalNumber}`);
   const progressPercentageDisplay = document.getElementById(`progress-percentage-${goalNumber}`);
-  progressBar.style.width = `${total}%`;
-  progressPercentageDisplay.textContent = `${total}%`;
-  if (total > 0 && audioEffects[goalNumber]) {
-    audioEffects[goalNumber].play();
+  if (progressBar) {
+    progressBar.style.width = `${cappedTotal}%`;
+  }
+  if (progressPercentageDisplay) {
+    progressPercentageDisplay.textContent = `${cappedTotal}%`;
+  }
+  if (cappedTotal > 0 && audioEffects[goalNumber] && typeof audioEffects[goalNumber].play === "function") {
+    audioEffects[goalNumber].play().catch(() => {});
   }
 }
 
@@ -111,9 +128,7 @@ function addMilestoneToGoal(goalNumber, milestoneIndex, value, labelText) {
   const newLabel = document.createElement("label");
   newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${milestoneIndex}" value="${value}" /> ${labelText}`;
   container.appendChild(newLabel);
-  newLabel.querySelector("input").addEventListener("change", () => {
-    updateProgressBar(goalNumber);
-  });
+  attachMilestoneListener(newLabel.querySelector("input"));
 }
 
 // --- ADD NEW GOAL FUNCTION ---
@@ -212,22 +227,32 @@ function updateMiniGoal(goalNumber) {
   const miniGoalNameInput = document.getElementById("mini-goal-name-" + goalNumber);
   const goalTitleSpan = document.querySelector(`#goal-name-${goalNumber} .goal-title`);
   if (miniGoalNameInput && goalTitleSpan) {
-    goalTitleSpan.textContent = miniGoalNameInput.value;
+    goalTitleSpan.textContent = miniGoalNameInput.value.trim() || `Goal ${goalNumber}`;
   }
+
   const miniMilestoneEditor = document.getElementById("mini-milestone-editor-" + goalNumber);
+  if (!miniMilestoneEditor) {
+    return;
+  }
+
   const inputs = miniMilestoneEditor.querySelectorAll("input");
   for (let i = 0; i < inputs.length; i += 2) {
-    let nameInput = inputs[i];
-    let percentInput = inputs[i + 1];
-    let milestoneIndex = nameInput.dataset.index;
-    let checkbox = document.querySelector(`.milestone[data-goal="${goalNumber}"][data-index="${milestoneIndex}"]`);
+    const nameInput = inputs[i];
+    const percentInput = inputs[i + 1];
+    if (!nameInput || !percentInput) {
+      continue;
+    }
+
+    const milestoneIndex = nameInput.dataset.index;
+    const checkbox = document.querySelector(`.milestone[data-goal="${goalNumber}"][data-index="${milestoneIndex}"]`);
     if (checkbox) {
-      let parent = checkbox.parentElement;
+      const parent = checkbox.parentElement;
       while (parent.childNodes.length > 1) {
         parent.removeChild(parent.lastChild);
       }
-      parent.appendChild(document.createTextNode(" " + nameInput.value));
-      checkbox.value = percentInput.value;
+      const nextName = nameInput.value.trim() || `Milestone ${milestoneIndex}`;
+      parent.appendChild(document.createTextNode(" " + nextName));
+      checkbox.value = String(normalizeMilestoneValue(percentInput.value, 0));
     }
   }
   updateProgressBar(goalNumber);
@@ -236,24 +261,24 @@ function updateMiniGoal(goalNumber) {
 function miniAddMilestone(goalNumber) {
   const above = document.getElementById("milestones-above-" + goalNumber);
   const below = document.getElementById("milestones-below-" + goalNumber);
-  let countAbove = above.querySelectorAll(".milestone").length;
-  let countBelow = below.querySelectorAll(".milestone").length;
-  let total = countAbove + countBelow;
+  const total = document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`).length;
   if (total >= maxMilestonesPerGoal) {
     alert("Maximum number of milestones reached for this goal.");
     return;
   }
-  let newIndex = total + 1;
+
+  const newIndex = Array.from(document.querySelectorAll(`.milestone[data-goal="${goalNumber}"]`)).reduce((maxIndex, milestone) => {
+    const currentIndex = parseInt(milestone.dataset.index, 10);
+    return Number.isNaN(currentIndex) ? maxIndex : Math.max(maxIndex, currentIndex);
+  }, 0) + 1;
+
   let defaultValue = "10";
   let labelText = "Milestone " + newIndex;
-  // Always add to the "below" container for consistency
   const container = below;
   const newLabel = document.createElement("label");
   newLabel.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${newIndex}" value="${defaultValue}" /> ${labelText}`;
   container.appendChild(newLabel);
-  newLabel.querySelector("input").addEventListener("change", () => {
-    updateProgressBar(goalNumber);
-  });
+  attachMilestoneListener(newLabel.querySelector("input"));
   loadMiniEditor(goalNumber);
 }
 
@@ -379,11 +404,13 @@ function importData(event) {
               container = goalDiv.querySelector(".milestones.milestones-above");
             }
             const label = document.createElement("label");
-            label.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${milestoneNumber}" value="${milestoneData.value}"> ${milestoneData.name}`;
+            const safeValue = normalizeMilestoneValue(milestoneData.value, 10);
+            label.innerHTML = `<input type="checkbox" class="milestone" data-goal="${goalNumber}" data-index="${milestoneNumber}" value="${safeValue}"> ${milestoneData.name}`;
             if (milestoneData.completed) {
               label.querySelector("input").checked = true;
             }
             container.appendChild(label);
+            attachMilestoneListener(label.querySelector("input"));
           });
         }
 
