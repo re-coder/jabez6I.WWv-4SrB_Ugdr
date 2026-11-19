@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeToggleButtons();
   loadAudioEffects();
   setupExportImport();
+  initializeQuickNotes();
   // Load mini editors for each existing goal
   for (let i = 1; i <= currentGoalCount; i++) {
     loadMiniEditor(i);
@@ -46,6 +47,27 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("goals-container").scrollIntoView({ behavior: "smooth" });
   });
 });
+
+function initializeQuickNotes() {
+  const notes = document.getElementById("quick-notes-text");
+  const status = document.getElementById("quick-notes-status");
+  const storageKey = "stewards-quick-notes";
+
+  try {
+    notes.value = localStorage.getItem(storageKey) || "";
+  } catch (error) {
+    status.textContent = "Browser storage is unavailable; notes cannot be restored or saved.";
+  }
+
+  document.getElementById("save-quick-notes").addEventListener("click", () => {
+    try {
+      localStorage.setItem(storageKey, notes.value);
+      status.textContent = "Notes saved in this browser.";
+    } catch (error) {
+      status.textContent = "Unable to save notes. Browser storage may be unavailable.";
+    }
+  });
+}
 
 // Add event listeners to all existing milestone checkboxes
 function initializeMilestoneListeners() {
@@ -313,7 +335,8 @@ function exportData() {
   });
   const data = {
     title: titleHeading,
-    goals: goals
+    goals: goals,
+    notes: document.getElementById("quick-notes-text").value
   };
   const dataStr = JSON.stringify(data, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
@@ -335,6 +358,14 @@ function importData(event) {
       document.querySelector("h1").textContent = data.title;
       const titleInput = document.getElementById("page-title");
       if (titleInput) titleInput.value = data.title;
+    }
+    const notes = typeof data.notes === "string" ? data.notes : "";
+    document.getElementById("quick-notes-text").value = notes;
+    try {
+      localStorage.setItem("stewards-quick-notes", notes);
+    } catch (error) {
+      document.getElementById("quick-notes-status").textContent =
+        "Notes were imported but could not be saved in this browser.";
     }
     const goalsContainer = document.getElementById("goals-container");
     goalsContainer.innerHTML = "";
